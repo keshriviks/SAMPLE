@@ -1,0 +1,14 @@
+	url=https://192.168.116.151:8443/ima/login.do
+	browser=chrome
+	userName=sysadmin
+	password=facetime
+	serverID=4
+	network=InstantBloomberg
+	networktype=Bloomberg Employee View
+	TimeZone= IST
+	fileLocation=C:\time
+	SetTime=
+	dbType=sql
+	dbserver=766:1433
+	dbname=Teamsdemo
+	username=sa

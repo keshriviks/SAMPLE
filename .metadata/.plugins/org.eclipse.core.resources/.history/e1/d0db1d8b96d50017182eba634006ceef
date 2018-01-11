@@ -1,0 +1,26 @@
+package Sam.com.actiance.Teams.test1;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+
+public class GetdataFromPropertiesfile {
+
+	static Properties OR;
+	
+	 public  void loadData() throws IOException  { 
+		    OR = new Properties();
+			File file = new File("C:\\Users\\VKeshri\\workspace\\com.actiance.Teams\\src\\main\\java\\config.properties");
+			
+			
+			FileInputStream f = new FileInputStream(file);
+			OR.load(f);
+	 }
+	 public static String getObject(String Data){
+		 String data = OR.getProperty(Data);
+		 return data;
+		 
+	 }
+	
+}

@@ -1,0 +1,47 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+  
+  
+<suite name="Exporter" verbose="1">
+
+<!-- Database Details -->
+	<parameter name="driverName"  value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
+	<parameter name="db_url"  value="jdbc:sqlserver://192.168.117.11:1433"/>
+	<parameter name = "dbName" value="decmu_16214"/>
+	<parameter name="user"  value="sa"/>
+	<parameter name="password"  value="FaceTime@123"/>
+	
+<!-- Exporter Details -->	
+	<parameter name="numberOfExporter"  value="1"/>
+	<parameter name="testScenarioFolder"  value="D:\work\ExporterTest\TestCase\BB\TestAgain\AnoopTest"/>
+	<parameter name="vantageFile"  value="D:\work\ExporterTest\Vantage_Config\vantage.properties"/>
+	<parameter name="smtpServer"  value="192.168.114.42"/>
+	<parameter name="fromHeader"  value="u@act.in"/>
+	<parameter name="toHeader"  value="u@act.in"/>
+	<parameter name="smtpRecipients"  value="u@act.in"/>
+	<parameter name="smtpSender"  value="sender@act.in"/>
+	<parameter name="smtpPort"  value="25"/>
+	<parameter name="serverIDs"  value="8"/>
+	<parameter name = "emlDumpPath" value = "D:/D-Drive/Exporter/Automation/emls"/>
+	<parameter name= "failedDumpPath" value= "D:/D-Drive/Exporter/Automation/failed/emls"/>
+	<parameter name= "smtpEmlsPath" value= "D:/installed/hmailserver/Data/act.in"/>
+	<parameter name= "powerShellFileLocation" value= "D:/D-Drive/Exporter/power1.ps1"/>
+
+	<parameter name= "vantageIP" value= "192.168.117.110"/>
+	<parameter name= "vanUsername" value= "sysadmin"/>
+	<parameter name= "vanPassword" value= "facetime"/>
+	<parameter name= "profileName" value= "IBMProfile1"/>
+	
+	<parameter name= "defaultExporterTempletePath" value= "D:/D-Drive/Exporter/Automation/ExporterTemplate.properties"/>
+	<parameter name= "defaultXSLTPath" value= "D:/D-Drive/Exporter/XSLT/Default XSLT from Vntg"/>
+	
+	
+	
+	<test name="Exporter Test New">
+	  
+			<classes>
+		   	   <class name="com.actiance.test.exporterNew.tests.ExporterTest" />
+		   	 </classes>  
+	  </test>
+</suite>
+
+

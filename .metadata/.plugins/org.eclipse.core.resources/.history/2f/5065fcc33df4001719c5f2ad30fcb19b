@@ -1,0 +1,19 @@
+package com.actiance.tests;
+
+import java.io.IOException;
+
+import org.testng.annotations.BeforeMethod;
+
+import com.actiance.pageLibrary.TestBase;
+
+public class CreatingImporter extends TestBase {
+	
+	
+	@BeforeMethod
+
+	public void setUp() throws IOException, InterruptedException {
+		init();
+	}
+
+
+}

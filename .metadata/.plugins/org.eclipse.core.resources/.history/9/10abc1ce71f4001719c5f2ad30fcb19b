@@ -1,0 +1,115 @@
+package com.actiance.pageLibrary;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+public class ImporterSetting extends TestBase {
+
+	public WebDriver driver;
+	WebDriverWait wait;
+	
+	@FindBy(name="employeeSearchLocation")
+	 WebElement LDAPSearchlocation;
+	
+	@FindBy(name="employeeSearchFilter")
+	 WebElement LdapSearchFilter;
+	
+	@FindBy(name="employeeEmailDomains")
+	 WebElement CreateImporter;
+	
+	@FindBy(xpath=".//*[@id='content']/div[7]/table/tbody/tr/td[3]/input[2]")
+	 WebElement SelectImporter;
+
+	@FindBy(xpath=".//*[@id='content']/h2[3]/a")
+	 WebElement Setup;
+	
+	@FindBy(xpath=".//*[@id='section2']/table[1]/tbody/tr[1]/td[2]/input")
+	 WebElement Importerstatus;
+	
+	@FindBy(xpath=".//*[@id='section2']/table[1]/tbody/tr[2]/td[2]/input")
+	 WebElement Filelocation;
+	
+	@FindBy(xpath=".//*[@id='section2']/table[1]/tbody/tr[3]/td[2]/select/option")
+	 WebElement ServerId;
+	
+	@FindBy(xpath=".//*[@id='networkList']")
+	 WebElement Network;
+	
+	@FindBy(xpath=".//*[@id='xmlTypeList']")
+	 WebElement Type;
+	
+	@FindBy(xpath=".//*[@id='timeToProcessInters']")
+	 WebElement ImportingTime;
+	
+	@FindBy(xpath=".//*[@id='timezoneToProcessInters']")
+	 WebElement ImportingTimeZone;
+	
+	@FindBy(xpath=".//*[@id='btnApply']")
+	 WebElement OkButton;
+		
+	public ImporterSetting(WebDriver driver){
+		this.driver = driver;
+		PageFactory.initElements(driver, this);
+		}
+	
+	public void SelectServerId(){
+	
+	//Select serverId= new Select(driver.findElement(By.xpath(".//*[@id='section2']/table[1]/tbody/tr[3]/td[2]/select/option")));
+		Select serverId= new Select(ServerId);
+		serverId.selectByIndex(0);
+		//serverId.selectByVisibleText(getObject("serverID"));
+	
+	
+	
+	}
+	
+	public void networkOptions(){
+	
+		//Select network= new Select(driver.findElement(By.xpath(".//*[@id='networkList']")));
+		Select network= new Select( Network);
+		network.selectByVisibleText(getObject("network"));
+	}
+	
+	public void networktype(){
+		
+		//Select networktype= new Select(driver.findElement(By.xpath(".//*[@id='xmlTypeList']")));
+		Select networktype= new Select(Type);
+		networktype.selectByVisibleText(getObject("networktype"));
+	}
+	
+   public void ImportingTimeZone(){
+		
+		
+	   //Select timeZ= new Select(driver.findElement(By.xpath(".//*[@id='timezoneToProcessInters']")));
+	   Select timeZ= new Select(ImportingTimeZone);
+	   timeZ.selectByVisibleText(getObject("TimeZone"));
+	}
+
+   public void importerspecific() throws InterruptedException{
+	   SelectImporter.click();
+	   Thread.sleep(3000);
+	   Setup.click();
+	   Importerstatus.click();
+	   Thread.sleep(2000);
+	   Filelocation.sendKeys(getObject("fileLocation"));
+	   Thread.sleep(2000);
+	   SelectServerId();
+	   Thread.sleep(2000);
+	   networkOptions();
+	   Thread.sleep(2000);
+	   networktype();
+	   ImportingTime.sendKeys(getObject("SetTime"));
+	   Thread.sleep(2000);
+	   ImportingTimeZone();
+	   Thread.sleep(2000);
+	   OkButton.click();
+	   
+   }
+
+
+}

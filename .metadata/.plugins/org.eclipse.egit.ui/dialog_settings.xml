@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<item value="2" key="org.eclipse.egit.ui.internal.clone.GitSelectWizardPageWizardSel"/>
+	<item value="C:\Users\VKeshri\automation\.git" key="GitSelectRepositoryPage.lastRepository"/>
+	<list key="EGit.KnownHosts">
+		<item value="bitbucket.org"/>
+		<item value="git.eclipse.org"/>
+		<item value="github.com"/>
+	</list>
+	<list key="RepositorySelectionPage.UsedUris">
+		<item value="https://github.com/keshriviks/com.actiance.test.importer.collab.utils.git"/>
+		<item value="file:///D:\Study\importerCollab\importerCollab"/>
+		<item value="https://github.com/keshriviks/Utils-Connection.git"/>
+		<item value="https://github.com/keshriviks/Sample21"/>
+		<item value="file:///C:\Users\VKeshri\Desktop\git_install_CA_cert2"/>
+		<item value="https://MGarg@blrstash:8443/scm/van/automation.git"/>
+		<item value="https://blrstash:8443/scm/van/automation.git"/>
+	</list>
+	<section name="GitImportWizard">
+		<item value="true" key="GitProjectsImportPage.STORE_NESTED_PROJECTS"/>
+	</section>
+	<section name="GitCommitMessageComponent">
+		<list key="C:\Users\VKeshri\.git">
+			<item value="true"/>
+			<item value="VKeshri &lt;VKeshri@VKeshri-E7470.actiance.local&gt;"/>
+			<item value=""/>
+			<item value="VKeshri &lt;VKeshri@VKeshri-E7470.actiance.local&gt;"/>
+			<item value="0000000000000000000000000000000000000000"/>
+		</list>
+		<list key="C:\Users\VKeshri\automation\.git">
+			<item value="false"/>
+			<item value="VKeshri &lt;VKeshri@VKeshri-E7470.actiance.local&gt;"/>
+			<item value="INITIALIZE&#x0D;&#x0A;&#x0D;&#x0A;Change-Id: I0000000000000000000000000000000000000000&#x0D;&#x0A;"/>
+			<item value="VKeshri &lt;VKeshri@VKeshri-E7470.actiance.local&gt;"/>
+			<item value="b6a46b4c1c2b0972db72fcaca7bb6765386a22fd"/>
+		</list>
+	</section>
+	<section name="org.eclipse.egit.ui.internal.staging.StagingView">
+		<item value="500,500" key="STAGING_SASH_FORM_WEIGHT"/>
+		<item value="false" key="sortItemState"/>
+		<item value="500,500" key="HORIZONTAL_SASH_FORM_WEIGHT"/>
+	</section>
+</section>

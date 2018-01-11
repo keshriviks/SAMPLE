@@ -1,0 +1,19 @@
+	url=https://192.168.114.8:8443/ima/
+	browser=chrome
+	userName=sysadmin
+	password=facetime
+	serverIDnumber=1
+	network=InstantBloomberg
+	networktype=Bloomberg Employee View
+	TimeZone= IST
+	fileLocation=C:\\Users\\Administrator\\Desktop\\bbmailtest
+	SetTime=
+	networkName=sample1
+	//FilePath=D:\upload file\uploadFile.exe
+	modality=IM
+	dbType=sql
+	dbserver=766:1433
+	dbname=Teamsdemo
+	username=sa
+	
+	#BloombergMail   Bloomberg EMail View

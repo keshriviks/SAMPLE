@@ -1,0 +1,78 @@
+package com.actiance.tests.LDAP.utils;
+
+import java.sql.*;
+
+public class DatabaseUtils {
+	Connection con;
+	ResultSet rs;
+	Statement stmt;
+	
+	private String microsoftDriver = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+	private String oracleDriver = "oracle.jdbc.driver.OracleDriver";
+	
+	public String getMicrosoftDriver() {
+		return microsoftDriver;
+	}
+	
+	public String getOracleDriver() {
+		return oracleDriver;
+	}
+	
+	public String getDriver(){
+		String Driver = null;
+		
+		switch (System.getProperty("dbType")) {
+		case "SQLServer":
+			Driver = getMicrosoftDriver();
+			break;
+
+		case "OracleServer":
+			Driver = getOracleDriver();
+			break;
+		default:
+			break;
+		}
+		
+		return Driver;
+	}
+	
+	public Connection setConnection(String host, String user, String password) throws SQLException, ClassNotFoundException{
+		
+		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+		con = DriverManager.getConnection(host, user, password);
+		System.out.println("Created connection");
+		return con;
+		
+	}
+	
+	public Statement createStatement(Connection conn) throws SQLException{
+		
+		stmt = conn.createStatement();
+		System.out.println("Created a statement");
+		return stmt;
+		
+	}
+	
+	public ResultSet executeQuery(Statement st, String query){
+		try{
+			rs = st.executeQuery(query);
+			System.out.println("Executed the query: "+query);
+			return rs;
+		}catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Error while executing the query");
+		}
+		return null;
+	}
+	
+	public void closeConnection(Connection connect){
+		try{
+			connect.close();
+			System.out.println("Connection closed successfully");
+		}catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Error while closing the database connection");
+		}
+	}
+	
+}

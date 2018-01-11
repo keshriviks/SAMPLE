@@ -1,0 +1,44 @@
+package com.actiance.tests;
+
+import java.util.concurrent.TimeUnit;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.remote.LocalFileDetector;
+
+public class Samplelogin {
+	
+	public static void main(String[] args) throws InterruptedException {
+		
+	
+
+	System.setProperty("webdriver.chrome.driver", "D:\\Software\\chrome\\chromedriver.exe");
+	WebDriver driver = new ChromeDriver();
+	
+	
+	driver.manage().window().maximize();
+	driver.manage().timeouts().implicitlyWait(200, TimeUnit.SECONDS);
+    driver.manage().timeouts().pageLoadTimeout(150, TimeUnit.SECONDS);
+    driver.get("https://192.168.114.8:8443/ima/");
+    
+    driver.findElement(By.xpath("//input[@type='text']")).sendKeys("sysadmin");
+    driver.findElement(By.xpath("//input[@type='password']")).sendKeys("facetime");
+    driver.findElement(By.xpath("//input[@class='button']")).click();
+    
+    Thread.sleep(3000);
+    driver.findElement(By.linkText("Configuration")).click();
+    driver.findElement(By.linkText("API Network Registration")).click();
+    Thread.sleep(3000);
+    driver.findElement(By.id("add")).click();
+    driver.findElement(By.id("import")).click();
+    
+    ((ChromeDriver) driver).setFileDetector(new LocalFileDetector());
+    WebElement upload = driver.findElement(By.id("importFile"));
+    upload.sendKeys("D:\\Jive\\Registeration Api\\jiveApiImportShowContext.xml");
+    driver.findElement(By.id("submit")).click();
+    
+}
+
+}

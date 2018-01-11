@@ -1,0 +1,65 @@
+package com.actiance.test.importer.IM.utils;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Message {
+
+	@XmlElement(name = "LoginName")
+	private String loginName;
+
+	@XmlElement(name = "DateTimeUTC")
+	private Long dateTimeUTC;
+
+	@XmlElement(name = "Content")
+	private String content;
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	@XmlElement(name = "User")
+	private User user;
+
+	@XmlElement(name = "Base64Content")
+	private String Base64Content;
+
+	public String getLoginName() {
+		return loginName;
+	}
+
+	public void setLoginName(String loginName) {
+		this.loginName = loginName;
+	}
+
+	public Long getDateTimeUTC() {
+		return dateTimeUTC;
+	}
+
+	public void setDateTimeUTC(Long dateTimeUTC) {
+		this.dateTimeUTC = dateTimeUTC;
+	}
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent1(String content) {
+		this.content = content;
+	}
+
+	public String getBase64Content() {
+		return Base64Content;
+	}
+
+	public void setBase64Content(String base64Content) {
+		Base64Content = base64Content;
+	}
+
+}

@@ -1,0 +1,52 @@
+package com.actiance.tests;
+
+import java.io.IOException;
+import java.sql.SQLException;
+
+import org.openqa.selenium.WebDriver;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import com.actiance.pageLibrary.APINetworkRegistration;
+import com.actiance.pageLibrary.Configuration;
+import com.actiance.pageLibrary.Dashboard;
+import com.actiance.pageLibrary.Importer;
+
+import com.actiance.pageLibrary.Login;
+import com.actiance.pageLibrary.TestBase;
+
+
+
+public class CreateImporter extends TestBase {
+	
+	Login login;
+	Dashboard dashboard;
+	Configuration configuration;
+	Importer importer;
+	APINetworkRegistration APInetwork;
+	
+	@BeforeMethod
+
+	public void setUp() throws IOException, InterruptedException {
+		init();
+	}
+
+	
+	@Test
+	public void ImporterSetting() throws InterruptedException, IOException, ClassNotFoundException, SQLException {
+		
+		login = new Login(driver);
+		dashboard= new Dashboard(driver);
+		configuration = new Configuration(driver);
+		importer= new Importer(driver);
+		APInetwork=new APINetworkRegistration(driver);
+		
+		login.loginToApplication();
+		dashboard.clickConfiguration();
+		configuration.clickAPiNetworkRegistration();
+		APInetwork.CReateCustomNetwork();
+		//configuration.clickImporter();
+		//importer.importerspecific();
+
+}
+}

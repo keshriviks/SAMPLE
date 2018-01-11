@@ -1,0 +1,39 @@
+package com.actiance.tests;
+
+import java.io.IOException;
+import java.sql.SQLException;
+
+import org.testng.annotations.BeforeMethod;
+
+import com.actiance.pageLibrary.Login;
+import com.actiance.pageLibrary.TestBase;
+
+import Sam.com.actiance.Teams.UiActions.ChatRoomPage;
+import Sam.com.actiance.Teams.UiActions.LoginPage;
+import Sam.com.actiance.Teams.UiActions.LoginPageNEW;
+import Sam.com.actiance.Teams.UiActions.TeamsHomePage;
+
+public class CreatingImporter extends TestBase {
+	
+	Login login;
+	
+	@BeforeMethod
+
+	public void setUp() throws IOException, InterruptedException {
+		init();
+	}
+
+	
+	@Test
+	public void OneChatRoom() throws InterruptedException, IOException, ClassNotFoundException, SQLException {
+		
+		login = new Login(driver);
+		
+
+		//loginpage.loginToApplication();
+		loginNew.loginToApplication();
+		teamshomepage.clickOnChatRoom();
+		chatroompage.clickOne2One();
+		long messageSentTime = chatroompage.enterOnChatTextOne2One(text);
+
+}

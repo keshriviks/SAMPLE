@@ -1,0 +1,6 @@
+package com.actiance.test.vantage;
+
+public class Snippet {
+	<suite name="XMLGeneration" verbose="1" parallel="classes" thread-count="1" data-provider-thread-count="1">
+}
+

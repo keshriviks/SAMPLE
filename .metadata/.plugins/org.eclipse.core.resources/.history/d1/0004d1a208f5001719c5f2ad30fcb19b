@@ -1,0 +1,48 @@
+package com.actiance.tests;
+
+import java.io.IOException;
+import java.sql.SQLException;
+
+import org.openqa.selenium.WebDriver;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import com.actiance.pageLibrary.Configuration;
+import com.actiance.pageLibrary.Dashboard;
+import com.actiance.pageLibrary.ImporterSetting;
+import com.actiance.pageLibrary.Login;
+import com.actiance.pageLibrary.TestBase;
+
+
+
+public class CreatingImporter extends TestBase {
+	//WebDriver driver;
+	Login login;
+	Dashboard dashboard;
+	Configuration configuration;
+	ImporterSetting importer;
+	
+	
+	@BeforeMethod
+
+	public void setUp() throws IOException, InterruptedException {
+		init();
+	}
+
+	
+	@Test
+	public void ImporterSetting() throws InterruptedException, IOException, ClassNotFoundException, SQLException {
+		
+		login = new Login(driver);
+		login.loginToApplication();
+		dashboard= new Dashboard(driver);
+		dashboard.clickConfiguration();
+		configuration = new Configuration(driver);
+		configuration.clickImporter();
+		
+		importer= new ImporterSetting(driver);
+		importer.importerspecific();
+
+		
+}
+}

@@ -1,0 +1,171 @@
+package LDAP;
+
+import static org.testng.Assert.assertEquals;
+
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Properties;
+
+import javax.naming.directory.Attributes;
+import javax.naming.directory.BasicAttribute;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.ModificationItem;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.PageFactory;
+
+import com.actiance.tests.LDAP.utils.BrowSetupAndLoadUrl;
+import com.actiance.tests.LDAP.utils.Configuration;
+import com.actiance.tests.LDAP.utils.Dashboard;
+import com.actiance.tests.LDAP.utils.DatabaseUtils;
+import com.actiance.tests.LDAP.utils.DirectoryServerSettings;
+import com.actiance.tests.LDAP.utils.Groups;
+import com.actiance.tests.LDAP.utils.Import;
+import com.actiance.tests.LDAP.utils.ImportDirectoryGroups;
+import com.actiance.tests.LDAP.utils.LDAPConstants;
+import com.actiance.tests.LDAP.utils.SyncPreviouslyImportedGroups;
+import com.actiance.tests.LDAP.utils.TestUtils;
+import com.actiance.tests.LDAP.utils.VantageLogIn;
+
+public class LDAP2016Test implements LDAPConstants{
+	
+	public static void main(String[] args) {
+		
+		//Driver and Wait classes
+				WebDriver driver;
+
+				Connection con = null;
+				Statement stmt;
+				DirContext dirCon = null;
+
+				DatabaseUtils db = new DatabaseUtils();
+				TestUtils util = new TestUtils();
+				
+				BrowSetupAndLoadUrl brow = null;
+				VantageLogIn vanLogIn;
+				Dashboard dashboard;
+				Configuration configuration;
+				DirectoryServerSettings directoryServerSettings;
+				Groups group;
+				Import impo;
+				ImportDirectoryGroups importDirGrp;
+				SyncPreviouslyImportedGroups syncGroups;
+				
+				Properties prop = new Properties();
+				InputStream input = null;
+				Attributes userAttributes;
+				String domainName;
+				String groupDN = null;
+				String groupDNSpecial = null;
+				ArrayList<String> empDNs = new ArrayList<>();
+				
+				//For holding Group, Group Members and BuddyName mapping details
+				HashMap<String, String> impGrpDetails;
+				String[] groupMembers;
+				HashMap<String, HashMap<String, String>> empDetails;
+				HashMap<String, String> buddyNameMappingDetails;
+				//Attributes userAttributes;
+				String[] timeAMPMZone;
+				boolean testResult = true;
+				boolean flag = false;
+				
+				long startTime;
+				long endTime;
+				int initialCount;
+
+		LDAP2016Test test = new LDAP2016Test();
+
+		try{
+			input = new FileInputStream("C:/Users/Administrator/git/automation/CVSROOT/Automation/VantageAutomation/src/main/resources/config.properties");
+
+			// load a properties file
+			prop.load(input);
+			
+			//Connect to Database
+			
+			con = db.setConnection(util.getDatabaseURL(prop.getProperty("databaseHost"), prop.getProperty("databaseTable")), 
+					prop.getProperty("databaseUser"), prop.getProperty("databasePassword"));
+			stmt = db.createStatement(con);
+			
+			//Open browser and load url
+			brow = new BrowSetupAndLoadUrl();
+			driver = brow.openBrowserAndLoadUrl(prop.getProperty("Profile"), util.getVantageURL(prop.getProperty("vantageIP")));
+			
+			//log in to the Vantage
+			vanLogIn = PageFactory.initElements(driver, VantageLogIn.class);
+			dashboard = vanLogIn.logIn(prop.getProperty("vantageUser"), prop.getProperty("vantagePassword"));
+			assertEquals(driver.getTitle().trim(), "Vantage - Dashboard", "Log In issue");
+			System.out.println("Successfully Logged In to the Vantage");
+			System.out.println();
+			
+			//Set the LDAP Connection
+			configuration = dashboard.gotoConfiguration();
+			directoryServerSettings = configuration.gotoDirectoryServerSettings(prop.getProperty("Version"));
+			configuration = directoryServerSettings.setLDAPConnection(prop.getProperty("DirectoryDefinition"), true, true, 
+					prop.getProperty("DirectoryServerType"), prop.getProperty("DirectoryServerHost"), prop.getProperty("Port"), 
+					prop.getProperty("BaseDN"), prop.getProperty("AuthenticationType"), prop.getProperty("UserName"), 
+					prop.getProperty("Password"));
+			//Set Directory Field Mapping
+			directoryServerSettings = configuration.gotoDirectoryServerSettings(prop.getProperty("Version"));
+			configuration = directoryServerSettings.setLDAPDirectoryFieldMapping(prop.getProperty("Password"), 
+					prop.getProperty("Network"), prop.getProperty("BuddyNameMapping"), 
+					prop.getProperty("DirectoryDefinition"), prop.getProperty("EmployeeID"));
+	/*	
+			//Create Group
+			groupDN = "CN="+newGroupName+","+prop.getProperty("BaseDN");
+			util.createGroup(groupDN, dirCon);*/
+			//Create employees
+			domainName = util.getDomainName(prop.getProperty("BaseDN"));
+			userAttributes = util.getUserAttributes(0+1, domainName);
+			if(!test.createUser("CN="+employeeDN+(0+1)+","+prop.getProperty("BaseDN"), dirCon, userAttributes)){
+				System.out.println("Could not craete a subcontext");
+				brow.closeBrowser();
+				db.closeConnection(con);
+				dirCon.close();
+			}
+	}catch(Exception e){
+		System.err.println(e.getMessage());
+		e.printStackTrace();
+	}
+	}
+	
+	
+	public boolean createUser(String DN, DirContext dirCon, Attributes attr){
+		//set password is a ldap modfy operation
+		//and we'll update the userAccountControl
+		//enabling the acount and force the user to update ther password
+		//the first time they login
+		try{
+			ModificationItem[] mod = new ModificationItem[1]; 
+		
+			//Replace the "unicdodePwd" attribute with a new value
+			//Password must be both Unicode and a quoted string
+			String newQuotedPassword = "\"facetime\"";
+			byte[] newUnicodePassword = newQuotedPassword.getBytes("UTF-16LE");
+		
+			System.out.println("DN: "+DN);
+			//System.out.println(attr.toString());
+			
+			//Create user
+			dirCon.createSubcontext(DN, attr);
+			System.out.println("Executed createSubcontext method");
+			
+			mod[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("userPassword", newUnicodePassword));
+			
+			//Perform the update
+			dirCon.modifyAttributes(DN, mod);
+			System.out.println("Updated password");
+			return true;
+		}catch(Exception e){
+			e.printStackTrace();
+			return false;
+		}
+		
+	}
+	
+
+}

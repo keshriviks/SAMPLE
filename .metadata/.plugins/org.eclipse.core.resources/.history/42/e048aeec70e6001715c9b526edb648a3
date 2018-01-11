@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="SharePoint New Approach Sub Site Level Lists">
+	
+	<parameter name="dbUrl" value="jdbc:sqlserver://192.168.126.204:1433;database=Mahi_OCTMU"/>
+	<parameter name="dbUser" value="sa"/>
+	<parameter name="dbPassword" value="FaceTime@123"/>
+	<parameter name="CSVFile" value="C:\Users\VKeshri\automation\CVSROOT\Automation\VantageAutomation\src\main\resources\SharepointNewApproachSubSiteLevelLists_V1.1.csv"/>
+
+	
+	<test name="SharePoint Sub Site Level Lists Test">
+	
+		<classes>
+			<class name="com.actiance.test.sharepointNewApproach.tests.SubSiteLevelLists"/>
+		</classes>
+	
+	</test>
+</suite>

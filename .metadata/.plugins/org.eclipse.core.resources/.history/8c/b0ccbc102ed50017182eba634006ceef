@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="XMLGeneration" verbose="1" parallel="tests" thread-count="3" data-provider-thread-count="1">
+  <test name="Test">
+    <classes>
+      <class name="Sam.com.actiance.Teams.test1.One2One"/>
+      <class name="Sam.com.actiance.Teams.test1.Nway"/>
+      <class name="Sam.com.actiance.Teams.test1.channel"/>
+    </classes>
+  </test> <!-- Test -->
+</suite> <!-- Suite -->

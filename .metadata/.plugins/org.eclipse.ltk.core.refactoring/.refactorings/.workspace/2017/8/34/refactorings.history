@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Delete resource &apos;com.actiance.test.importer.collab.utils&apos;" deleteContents="false" description="Delete resource &apos;com.actiance.test.importer.collab.utils&apos;" element1="/com.actiance.test.importer.collab.utils" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1503478840114"/>
+</session>

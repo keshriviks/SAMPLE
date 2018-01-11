@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="SharePoint New Approach For Libraries">
+
+	<parameter name="dbUrl" value="jdbc:sqlserver://192.168.114.214:1433;database=vj2015r2gab13571"/>
+	<parameter name="dbUser" value="sa"/>
+	<parameter name="dbPassword" value="FaceTime@123"/>
+	<parameter name="CSVFile" value="D:\SharePoint\New Approach\Libraires\LibrariesTestCSV.csv"/>
+
+	
+	<test name="SharePoint Libraries">
+	
+		<classes>
+			<class name="com.actiance.test.sharepointNewApproach.tests.Libraries"/>
+		</classes>
+	
+	</test>
+</suite>

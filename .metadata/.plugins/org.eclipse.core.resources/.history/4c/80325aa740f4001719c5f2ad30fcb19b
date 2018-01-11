@@ -1,0 +1,68 @@
+package com.actiance.pageLibrary;
+
+import java.io.IOException;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+
+public class Login extends TestBase {
+	
+	@FindBy(xpath="//input[@type='text']")
+	 WebElement username;
+	
+	@FindBy(xpath="//input[@type='password']")
+	 WebElement Password;
+	
+	@FindBy(xpath="//input[@class='button']")
+	 WebElement submitLogin;
+
+	WebDriver driver;
+	WebDriverWait wait;
+	
+	public Login(WebDriver driver)
+	{
+		this.driver=driver;
+		wait=new WebDriverWait(driver,120);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+/*	public void loginToApplication() throws InterruptedException, IOException{
+		
+		loadData();
+		
+		//log("cliked on sign in and object is:-"+signIn.toString());
+		//NewAccount.click();
+		UserId.sendKeys(getObject("userName"));
+		//log("entered email address:-"+UserName+" and object is "+UserID.toString());
+		Thread.sleep(5000);
+		NextButton.click();
+		password.sendKeys(getObject("password"));
+		//log("entered password:-"+password+" and object is "+Password.toString());
+		Thread.sleep(5000);
+		SignIN.click();
+		Thread.sleep(40000);
+		System.out.println("clicked on chat room helloooooo");
+		//log("clicked on submit button and object is:-"+SignIN.toString());
+	}*/
+	
+	public void loginToApplication() throws IOException, InterruptedException{
+		
+		loadData();
+		username.sendKeys(getObject("userName"));
+		Password.sendKeys(getObject("password"));
+		Thread.sleep(3000);
+		submitLogin.click();
+		
+	}
+
+}

@@ -1,0 +1,51 @@
+package com.actiance.pageLibrary;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+
+
+public class Configuration {
+	
+	
+		WebDriver driver;
+		WebDriverWait wait;
+		
+		@FindBy(linkText="Configuration")
+		 WebElement Configuration;
+		
+		@FindBy(linkText="Import Settings")
+		 WebElement ImporterSettings ;
+		
+	
+		public Configuration(WebDriver driver){
+			this.driver = driver;
+			PageFactory.initElements(driver, this);
+		
+		}
+		public void clickConfiguration(){
+			wait.until(ExpectedConditions.visibilityOf(Configuration));
+			Configuration.click();
+		}
+		public void clickImporter(){
+			
+			ImporterSettings.click();
+		}
+		
+	
+		
+		public void clickSharepointCompliance(){
+			wait.until(ExpectedConditions.visibilityOf(sharepointCompliance));
+			sharepointCompliance.click();
+		}
+		
+		public SharepointCompliance gotoSharepointCompliance(){
+			clickSharepointCompliance();
+			return PageFactory.initElements(driver, SharepointCompliance.class);
+		}
+
+}

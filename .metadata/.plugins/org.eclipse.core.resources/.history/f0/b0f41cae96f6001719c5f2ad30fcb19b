@@ -1,0 +1,75 @@
+package com.actiance.tests.LDAP.utils;
+
+public class TestDataObject {
+	
+	private String testCaseNo;
+	private String testCaseName;
+	private String employeeID;
+	private String network;
+	private String buddyNameMapping;
+	private String groupName;
+	private String givenName;
+	private String sn;
+	private String domainName;
+	
+	public String getTestCaseNo() {
+		return testCaseNo;
+	}
+	public void setTestCaseNo(String testCaseNo) {
+		this.testCaseNo = testCaseNo;
+	}
+	
+	public String getTestCaseName() {
+		return testCaseName;
+	}
+	public void setTestCaseName(String testCaseName) {
+		this.testCaseName = testCaseName;
+	}
+	
+	public String getEmployeeID() {
+		return employeeID;
+	}
+	public void setEmployeeID(String employeeID) {
+		this.employeeID = employeeID;
+	}
+	
+	public String getNetwork() {
+		return network;
+	}
+	public void setNetwork(String network) {
+		this.network = network;
+	}
+	
+	public String getBuddyNameMapping() {
+		return buddyNameMapping;
+	}
+	public void setBuddyNameMapping(String buddyNameMapping) {
+		this.buddyNameMapping = buddyNameMapping;
+	}
+	
+	public String getGroupName() {
+		return groupName;
+	}
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
+	}
+	public String getGivenName() {
+		return givenName;
+	}
+	public void setGivenName(String givenName) {
+		this.givenName = givenName;
+	}
+	public String getSn() {
+		return sn;
+	}
+	public void setSn(String sn) {
+		this.sn = sn;
+	}
+	public String getDomainName() {
+		return domainName;
+	}
+	public void setDomainName(String domainName) {
+		this.domainName = domainName;
+	}
+
+}

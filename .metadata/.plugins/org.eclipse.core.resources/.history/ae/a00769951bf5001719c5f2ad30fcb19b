@@ -1,0 +1,31 @@
+
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+
+<suite name="Bloomberg Email " verbose="1" >
+
+	<!-- Database Details -->
+	<parameter name="dbType" value="MSSQL" />
+	<parameter name="dbHost" value="192.168.117.11" />
+	<parameter name="dbName" value="FF_sumukha" />
+	<parameter name="dbUsername" value="sa" />
+	<parameter name="dbPassword" value="FaceTime@123" />
+	<parameter name="folderLocation" value="D:\BBmail test bbmail\fidelity final"/>
+	<parameter name ="populate_Corporate_Email_Address" value = "true" />
+	<parameter name="tempLocation" value="D:\temp\final fidelity"/>
+	<parameter name="domains" value="lcsdomainad.com" />
+	<parameter name="vantageIP" value="192.168.116.151" />
+	<parameter name="vntgUser" value="sysadmin" />
+	<parameter name="vntgPassword" value="facetime" />
+	<parameter name="automappingUserFileLocation" value="D:\Automapping\BBEmail\BBEmailUser_New.CSV"></parameter>
+	<parameter name="internalEmp" value="false"></parameter>
+
+	<test name="Bloomberg Email ">
+
+		<classes>
+			<class name="com.actiance.test.BloombergEmail.tests.BloombergEMailTest" />
+		</classes>
+	</test>
+</suite>
+
+

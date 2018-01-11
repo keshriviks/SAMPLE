@@ -1,0 +1,10 @@
+package Sam.com.actiance.Teams;
+
+public class DBcall {
+	public static void main(String[] args) {
+		
+		
+		
+	}
+
+}

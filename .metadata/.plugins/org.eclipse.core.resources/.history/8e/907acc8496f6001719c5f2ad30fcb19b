@@ -1,0 +1,127 @@
+package com.actiance.tests.LDAP.utils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+public class Groups {
+	WebDriver driver;
+	WebDriverWait wait;
+	
+	@FindBy(id="import")
+	private WebElement impor;
+	
+	@FindBy(linkText="Configuration")
+	private WebElement Configuration;
+	
+	@FindBy(xpath="//div[@class='messageBar']")
+	private WebElement messageBar;
+	
+	public Groups(WebDriver driver) {
+		this.driver = driver;
+		wait = new WebDriverWait(driver, 60);
+	}
+	
+	public void clickImport(){
+		wait.until(ExpectedConditions.visibilityOf(impor));
+		impor.click();
+	}
+	
+	public void clickConfiguration(){
+		wait.until(ExpectedConditions.visibilityOf(Configuration));
+		Configuration.click();
+	}
+	
+	public Import gotoImport(){
+		clickImport();
+		return PageFactory.initElements(driver, Import.class);
+	}
+	
+	public Configuration gotoConfiguration(){
+		clickConfiguration();
+		return PageFactory.initElements(driver, Configuration.class);
+	}
+	
+	public HashMap<String, String> getImportedGroupDetails(String grpName){
+		wait.until(ExpectedConditions.visibilityOf(impor));
+		
+		HashMap<String, String> grpDetails = new HashMap<String, String>();
+		
+		String groupName = null;
+		String employees = null;
+		String type = null;
+		String directory = null;
+		String DN = null;
+		
+		ArrayList<WebElement> rows = (ArrayList<WebElement>) driver.findElements(By.xpath("//table[@id='employees']/tbody/tr"));
+		
+		for(int i=1;i<=rows.size();i++){
+			if(driver.findElement(By.xpath("//table[@id='employees']/tbody/tr["+i+"]/td[2]")).getText().startsWith(grpName)){
+				
+				groupName = driver.findElement(By.xpath("//table[@id='employees']/tbody/tr["+i+"]/td[2]")).getText();
+				employees = driver.findElement(By.xpath("//table[@id='employees']/tbody/tr["+i+"]/td[3]")).getText();
+				type = driver.findElement(By.xpath("//table[@id='employees']/tbody/tr["+i+"]/td[4]")).getText();
+				directory = driver.findElement(By.xpath("//table[@id='employees']/tbody/tr["+i+"]/td[5]")).getText();
+				DN = driver.findElement(By.xpath("//table[@id='employees']/tbody/tr["+i+"]/td[6]")).getText();
+				
+				System.out.println("Imported Group: "+groupName+", No. of Employees: "+employees);
+				System.out.println();
+				grpDetails.put("groupName", groupName);
+				grpDetails.put("employees", employees);
+				grpDetails.put("type", type);
+				grpDetails.put("directory", directory);
+				grpDetails.put("DN", DN);
+			}
+		}
+		return grpDetails;
+	}
+	
+	public boolean checkIfNumberOfEmployeesChanged(String groupName) throws InterruptedException{
+		wait.until(ExpectedConditions.visibilityOf(impor));
+		int employeesBefore = 0;
+		int employeesAfter = 0;
+		
+		for(int i=0;i<15;i++){
+			ArrayList<WebElement> rows = (ArrayList<WebElement>) driver.findElements(By.xpath("//table[@id='employees']/tbody/tr"));
+			for(int j=1;j<=rows.size();j++){
+				if(driver.findElement(By.xpath("//table[@id='employees']/tbody/tr["+j+"]/td[2]")).getText().startsWith(groupName)){
+					if(i==0){
+						employeesBefore = Integer.parseInt(driver.findElement(By.xpath("//table[@id='employees']/tbody/tr["+j+"]/td[3]")).getText());
+						employeesAfter = employeesBefore;
+						
+					}else{
+						driver.findElement(By.linkText("Groups")).click();
+						wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("addDynamic")));
+						employeesAfter = Integer.parseInt(driver.findElement(By.xpath("//table[@id='employees']/tbody/tr["+j+"]/td[3]")).getText());
+						System.out.println("Employees after "+i+" minutes: "+employeesAfter);
+						if(employeesAfter != employeesBefore){
+							return true;
+						}
+					}
+				}
+			}
+			Thread.sleep(60000);
+		}
+		return false;
+	}
+	
+	public boolean isErrorOccured(){
+		wait.until(ExpectedConditions.visibilityOf(impor));
+		try{
+			if(messageBar.getText().contains("Internal error occurred. Please see the logs for details")){
+				System.out.println(messageBar.getText());
+				return true;
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return false;
+	}
+}

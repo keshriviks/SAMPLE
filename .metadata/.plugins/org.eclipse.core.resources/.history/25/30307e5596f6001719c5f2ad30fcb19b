@@ -1,0 +1,704 @@
+package com.actiance.tests.LDAP.tests;
+
+import static org.testng.Assert.assertEquals;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Properties;
+
+import javax.naming.NamingException;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.PageFactory;
+
+import com.actiance.tests.LDAP.utils.BrowSetupAndLoadUrl;
+import com.actiance.tests.LDAP.utils.Configuration;
+import com.actiance.tests.LDAP.utils.Dashboard;
+import com.actiance.tests.LDAP.utils.DatabaseUtils;
+import com.actiance.tests.LDAP.utils.DirectoryServerSettings;
+import com.actiance.tests.LDAP.utils.Groups;
+import com.actiance.tests.LDAP.utils.Import;
+import com.actiance.tests.LDAP.utils.ImportDirectoryGroups;
+import com.actiance.tests.LDAP.utils.LDAPConstants;
+import com.actiance.tests.LDAP.utils.LDAPConstants_BBEmail;
+import com.actiance.tests.LDAP.utils.LDAPConstants_INBB;
+import com.actiance.tests.LDAP.utils.SyncPreviouslyImportedGroups;
+import com.actiance.tests.LDAP.utils.TestUtils;
+import com.actiance.tests.LDAP.utils.VantageLogIn;
+
+public class LDAPFullTest implements LDAPConstants{
+	
+	
+	public static void main(String[] args){
+		
+		//Driver and Wait classes
+		WebDriver driver;
+
+		Connection con = null;
+		Statement stmt;
+		DirContext dirCon = null;
+
+		DatabaseUtils db = new DatabaseUtils();
+		TestUtils util = new TestUtils();
+		
+		BrowSetupAndLoadUrl brow = null;
+		VantageLogIn vanLogIn;
+		Dashboard dashboard;
+		Configuration configuration;
+		DirectoryServerSettings directoryServerSettings;
+		Groups group;
+		Import impo;
+		ImportDirectoryGroups importDirGrp;
+		SyncPreviouslyImportedGroups syncGroups;
+		
+		Properties prop = new Properties();
+		InputStream input = null;
+		Attributes userAttributes;
+		String domainName;
+		String groupDN = null;
+		String groupDNSpecial = null;
+		ArrayList<String> empDNs = new ArrayList<>();
+		
+		//For holding Group, Group Members and BuddyName mapping details
+		HashMap<String, String> impGrpDetails;
+		String[] groupMembers;
+		HashMap<String, HashMap<String, String>> empDetails;
+		HashMap<String, String> buddyNameMappingDetails;
+		//Attributes userAttributes;
+		String[] timeAMPMZone;
+		boolean testResult = true;
+		boolean flag = false;
+		
+		long startTime;
+		long endTime;
+		int initialCount;
+
+		
+		try{
+			input = new FileInputStream("C:/Users/Administrator/git/automation/CVSROOT/Automation/VantageAutomation/src/main/resources/config.properties");
+
+			// load a properties file
+			prop.load(input);
+			
+			//Connect to Database
+			
+			con = db.setConnection(util.getDatabaseURL(prop.getProperty("databaseHost"), prop.getProperty("databaseTable")), 
+					prop.getProperty("databaseUser"), prop.getProperty("databasePassword"));
+			stmt = db.createStatement(con);
+			
+			//Open browser and load url
+			brow = new BrowSetupAndLoadUrl();
+			driver = brow.openBrowserAndLoadUrl(prop.getProperty("Profile"), util.getVantageURL(prop.getProperty("vantageIP")));
+			
+			//log in to the Vantage
+			vanLogIn = PageFactory.initElements(driver, VantageLogIn.class);
+			dashboard = vanLogIn.logIn(prop.getProperty("vantageUser"), prop.getProperty("vantagePassword"));
+			assertEquals(driver.getTitle().trim(), "Vantage - Dashboard", "Log In issue");
+			System.out.println("Successfully Logged In to the Vantage");
+			System.out.println();
+			
+			//Set the LDAP Connection
+			configuration = dashboard.gotoConfiguration();
+			directoryServerSettings = configuration.gotoDirectoryServerSettings(prop.getProperty("Version"));
+			configuration = directoryServerSettings.setLDAPConnection(prop.getProperty("DirectoryDefinition"), true, true, 
+					prop.getProperty("DirectoryServerType"), prop.getProperty("DirectoryServerHost"), prop.getProperty("Port"), 
+					prop.getProperty("BaseDN"), prop.getProperty("AuthenticationType"), prop.getProperty("UserName"), 
+					prop.getProperty("Password"));
+			
+			//Set Directory Field Mapping
+			directoryServerSettings = configuration.gotoDirectoryServerSettings(prop.getProperty("Version"));
+			configuration = directoryServerSettings.setLDAPDirectoryFieldMapping(prop.getProperty("Password"), 
+					prop.getProperty("Network"), prop.getProperty("BuddyNameMapping"), 
+					prop.getProperty("DirectoryDefinition"), prop.getProperty("EmployeeID"));
+			
+			//Scenario: 2
+			//Create a new group add new employees and Sync and verify in the database
+			//Get DirContext Object
+			dirCon = util.getDirContext(util.getLDAPURL(prop.getProperty("DirectoryServerHost")), 
+					prop.getProperty("AuthenticationType"), prop.getProperty("UserName"), prop.getProperty("Password"));
+			//Create Group
+			groupDN = "CN="+newGroupName+","+prop.getProperty("BaseDN");
+			util.createGroup(groupDN, dirCon);
+			//Create 5 employees
+			domainName = util.getDomainName(prop.getProperty("BaseDN"));
+			
+			System.out.println("Domain Name: "+ domainName);
+			for(int i=0; i<noOfEmployees; i++){
+				userAttributes = util.getUserAttributes(i+1, domainName);
+				if(!util.createUser("CN="+employeeDN+(i+1)+","+prop.getProperty("BaseDN"), dirCon, userAttributes)){
+					System.out.println("Could not craete a subcontext");
+					brow.closeBrowser();
+					db.closeConnection(con);
+					dirCon.close();
+					return;
+				}
+				empDNs.add("CN="+employeeDN+(i+1)+","+prop.getProperty("BaseDN"));
+				//Add the employee to the created group
+				util.modifyAttributes(groupDN, dirCon, "Add", "member", "CN="+employeeDN+(i+1)+","+prop.getProperty("BaseDN"));
+				System.out.println();
+			}
+			//Go to Groups page to import a Group
+			group = configuration.gotoGroups();
+			impo = group.gotoImport();
+			importDirGrp = impo.searchByGroupName(newGroupName, prop.getProperty("DirectoryDefinition"));
+			group = importDirGrp.importGroup(newGroupName);
+			Thread.sleep(2000);
+			//Get the imported group details
+			impGrpDetails = group.getImportedGroupDetails(newGroupName);
+			//Get DN value of each member of the Group from LDAP
+			groupMembers = util.getGroupMembers(dirCon, 
+					impGrpDetails.get("groupName").substring(0, impGrpDetails.get("groupName").indexOf("_")), 
+					impGrpDetails.get("DN"));
+			//Get more details of each member of the Group from the LDAP
+			empDetails = util.getEmployeeDetails(dirCon, groupMembers);
+			for(String user : empDetails.keySet()){
+				System.out.println("Member Detais from LDAP");
+				System.out.println("sn: "+empDetails.get(user).get("sn")+", givenName: "+empDetails.get(user).get("givenName")
+						+", userPrincipalName: "+empDetails.get(user).get("userPrincipalName")+", " +
+								"mail: "+empDetails.get(user).get("mail"));
+			}
+			System.out.println();
+			//Now get the Members details from Database and verify the buddyName mapping of each member
+			for(String employee : empDetails.keySet()){
+				ArrayList<String> values = util.getEmployeeDetails(stmt, empDetails.get(employee).get(prop.getProperty("EmployeeID")));
+				buddyNameMappingDetails = util.getBuddyNameDetails(stmt, values.get(0));
+				System.out.println("For employee: "+ employee +", the following details have been mapped");
+				System.out.println("FirstName: " + values.get(1)+ ", LastName: "+ values.get(2));
+				testResult = testResult & util.verifyEmployeeFirstNameAndLastName(values, empDetails.get(employee).get("givenName"), 
+						empDetails.get(employee).get("sn"));
+				if(testResult){
+					System.out.println("First Name and Last Name are matching");
+				}
+				flag = false;
+				if(buddyNameMappingDetails.size() == 0){
+					System.out.println("BuddyName Mapping value is 0");
+					testResult = false;
+				}else{
+					for(String buddyName : buddyNameMappingDetails.keySet()){
+						if(util.verifyBuddyNameAndNetwok(buddyName, empDetails.get(employee).get(prop.get("BuddyNameMapping"))
+								, buddyNameMappingDetails.get(buddyName), prop.getProperty("Network"))){
+									flag = true;
+									break;
+								}
+					}
+					if(!flag){
+						testResult = false;
+					}else{
+						testResult = testResult & flag;
+					}
+				}
+				
+				if(testResult){
+					System.out.println("BuddyName and Network are matching for: "+employee);
+				}else{
+					System.out.println("Either BuddyName or Network is not matching for: "+employee);
+				}
+				System.out.println();
+			}
+			
+			if(testResult){
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+				System.out.println("Scenario 2: Create a new group add new employees and Sync and verify in the database");
+				System.out.println("Pass");
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+			}else{
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+				System.out.println("Scenario 2: Create a new group add new employees and Sync and verify in the database");
+				System.out.println("Failed");
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+				brow.closeBrowser();
+				db.closeConnection(con);
+				dirCon.close();
+				return;
+			}
+			
+			//Scenario: 3
+			//Updated First Name and Last Name of first two employees and Sync
+			util.modifyAttributes(empDNs.get(0), dirCon, "Replace", "givenName", "LDAP1Update");
+			util.modifyAttributes(empDNs.get(0), dirCon, "Replace", "sn", "Automaton1Update");
+			util.modifyAttributes(empDNs.get(1), dirCon, "Replace", "givenName", "LDAP2Update");
+			util.modifyAttributes(empDNs.get(1), dirCon, "Replace", "sn", "Automaton2Update");
+			//Synch previously imported group
+			//group = configuration.gotoGroups(); 													////remove this
+			impo = group.gotoImport();
+			syncGroups = impo.gotoSyncPreviouslyImportedGroups(prop.getProperty("DirectoryDefinition"));
+			group = syncGroups.syncImportedGroup(newGroupName);
+			Thread.sleep(5000);
+			//Get the imported group details
+			impGrpDetails = group.getImportedGroupDetails(newGroupName);
+			//Get DN value of each member of the Group from LDAP
+			groupMembers = util.getGroupMembers(dirCon, 
+					impGrpDetails.get("groupName").substring(0, impGrpDetails.get("groupName").indexOf("_")), 
+					impGrpDetails.get("DN"));
+			//Get more details of each member of the Group from the LDAP
+			empDetails = util.getEmployeeDetails(dirCon, groupMembers);
+			for(String user : empDetails.keySet()){
+				System.out.println("Member Detais from LDAP");
+				System.out.println("sn: "+empDetails.get(user).get("sn")+", givenName: "+empDetails.get(user).get("givenName")
+						+", userPrincipalName: "+empDetails.get(user).get("userPrincipalName")+", " +
+								"mail: "+empDetails.get(user).get("mail"));
+			}
+			System.out.println();
+			//Now get the Members details from Database and verify the buddyName mapping of each member
+			for(String employee : empDetails.keySet()){
+				ArrayList<String> values = util.getEmployeeDetails(stmt, empDetails.get(employee).get(prop.getProperty("EmployeeID")));
+				buddyNameMappingDetails = util.getBuddyNameDetails(stmt, values.get(0));
+				System.out.println("For employee: "+ employee +", the following details have been mapped");
+				System.out.println("FirstName: " + values.get(1)+ ", LastName: "+ values.get(2));
+				testResult = testResult & util.verifyEmployeeFirstNameAndLastName(values, empDetails.get(employee).get("givenName"), 
+						empDetails.get(employee).get("sn"));
+				if(testResult){
+					System.out.println("First Name and Last Name are matching");
+				}
+				flag = false;
+				if(buddyNameMappingDetails.size() == 0){
+					System.out.println("BuddyName Mapping value is 0");
+					testResult = false;
+				}else{
+					for(String buddyName : buddyNameMappingDetails.keySet()){
+						if(util.verifyBuddyNameAndNetwok(buddyName, empDetails.get(employee).get(prop.get("BuddyNameMapping"))
+								, buddyNameMappingDetails.get(buddyName), prop.getProperty("Network"))){
+									flag = true;
+									break;
+								}
+					}
+					if(!flag){
+						testResult = false;
+					}else{
+						testResult = testResult & flag;
+					}
+				}
+				
+				if(testResult){
+					System.out.println("BuddyName and Network are matching for: "+employee);
+				}else{
+					System.out.println("Either BuddyName or Network is not matching for: "+employee);
+				}
+				System.out.println();
+			}
+			
+			if(testResult){
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+				System.out.println("Scenario 3: Updated First Name and Last Name of first two employees and Sync");
+				System.out.println("Pass");
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+			}else{
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+				System.out.println("Scenario 3: Updated First Name and Last Name of first two employees and Sync");
+				System.out.println("Failed");
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+				brow.closeBrowser();
+				db.closeConnection(con);
+				dirCon.close();
+				return;
+			}
+			
+			
+			//Scenario 4
+			//Change buddyName mapping and sync
+			//group = configuration.gotoGroups(); 													////remove this
+			configuration = group.gotoConfiguration();
+			directoryServerSettings = configuration.gotoDirectoryServerSettings(prop.getProperty("Version"));
+			configuration = directoryServerSettings.resetLDAPDirectoryFieldMapping(prop.getProperty("Password"), prop.getProperty("Version"),
+					prop.getProperty("DirectoryDefinition"));
+			directoryServerSettings = configuration.gotoDirectoryServerSettings(prop.getProperty("Version"));
+			configuration = directoryServerSettings.setLDAPDirectoryFieldMapping(prop.getProperty("Password"), prop.getProperty("Network"),
+					prop.getProperty("NewBuddyNameMapping"), prop.getProperty("DirectoryDefinition"), prop.getProperty("EmployeeID"));
+			group = configuration.gotoGroups();
+			impo = group.gotoImport();
+			syncGroups = impo.gotoSyncPreviouslyImportedGroups(prop.getProperty("DirectoryDefinition"));
+			group = syncGroups.syncImportedGroup(newGroupName);
+			Thread.sleep(5000);
+			//Get the imported group details
+			impGrpDetails = group.getImportedGroupDetails(newGroupName);
+			//Get DN value of each member of the Group from LDAP
+			groupMembers = util.getGroupMembers(dirCon, 
+					impGrpDetails.get("groupName").substring(0, impGrpDetails.get("groupName").indexOf("_")), 
+					impGrpDetails.get("DN"));
+			//Get more details of each member of the Group from the LDAP
+			empDetails = util.getEmployeeDetails(dirCon, groupMembers);
+			for(String user : empDetails.keySet()){
+				System.out.println("Member Detais from LDAP");
+				System.out.println("sn: "+empDetails.get(user).get("sn")+", givenName: "+empDetails.get(user).get("givenName")
+						+", userPrincipalName: "+empDetails.get(user).get("userPrincipalName")+", " +
+								"mail: "+empDetails.get(user).get("mail"));
+			}
+			System.out.println();
+			//Now get the Members details from Database and verify the buddyName mapping of each member
+			for(String employee : empDetails.keySet()){
+				ArrayList<String> values = util.getEmployeeDetails(stmt, empDetails.get(employee).get(prop.getProperty("EmployeeID")));
+				buddyNameMappingDetails = util.getBuddyNameDetails(stmt, values.get(0));
+				System.out.println("For employee: "+ employee +", the following details have been mapped");
+				System.out.println("FirstName: " + values.get(1)+ ", LastName: "+ values.get(2));
+				testResult = testResult & util.verifyEmployeeFirstNameAndLastName(values, empDetails.get(employee).get("givenName"), 
+						empDetails.get(employee).get("sn"));
+				if(testResult){
+					System.out.println("First Name and Last Name are matching");
+				}
+				flag = false;
+				if(buddyNameMappingDetails.size() == 0){
+					System.out.println("BuddyName Mapping value is 0");
+					testResult = false;
+				}else{
+					for(String buddyName : buddyNameMappingDetails.keySet()){
+						if(util.verifyBuddyNameAndNetwok(buddyName, empDetails.get(employee).get(prop.get("NewBuddyNameMapping"))
+								, buddyNameMappingDetails.get(buddyName), prop.getProperty("Network"))){
+									flag = true;
+									break;
+								}
+					}
+					if(!flag){
+						testResult = false;
+					}else{
+						testResult = testResult & flag;
+					}
+				}
+				
+				if(testResult){
+					System.out.println("BuddyName and Network are matching for: "+employee);
+				}else{
+					System.out.println("Either BuddyName or Network is not matching for: "+employee);
+				}
+				System.out.println();
+			}
+			
+			if(testResult){
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+				System.out.println("Scenario 4: Change buddyName mapping and sync");
+				System.out.println("Pass");
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+			}else{
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+				System.out.println("Scenario 4: Change buddyName mapping and sync");
+				System.out.println("Failed");
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+				brow.closeBrowser();
+				db.closeConnection(con);
+				dirCon.close();
+				return;
+			}
+			
+			//Sceanrio 5
+			//Disable fist and second employee and the sync the group
+			//the userAccountControl Value is for [ AccountDisabled, NormalAccount, NoPasswordExpiration ]
+			util.modifyAttributes(empDNs.get(0), dirCon, "Replace", "userAccountControl", userAccountDisable);
+			util.modifyAttributes(empDNs.get(1), dirCon, "Replace", "userAccountControl", userAccountDisable);
+			//Set Auto Sync for LDAP
+			//group = configuration.gotoGroups(); 													////remove this
+			configuration = group.gotoConfiguration();
+			directoryServerSettings = configuration.gotoDirectoryServerSettings(prop.getProperty("Version"));
+			//Get current time and start Auto Sync at current time plus 2 minutes.
+			timeAMPMZone = util.getTime().split(" ");
+			configuration = directoryServerSettings.setEnableAutoSync(prop.getProperty("Password"), timeAMPMZone[2], "2", "minute(s)", 
+					timeAMPMZone[0], timeAMPMZone[1], "Any", prop.getProperty("DirectoryDefinition"));
+			group = configuration.gotoGroups();
+			if(group.checkIfNumberOfEmployeesChanged(newGroupName)){
+				System.out.println("Number of employees has been changed due to Auto Sync");
+			}else{
+				System.out.println("Number of employees remained the same even after Auto Sync. There might be an issue, please check");
+				brow.closeBrowser();
+				db.closeConnection(con);
+				dirCon.close();
+				return;
+			}
+			group = PageFactory.initElements(driver, Groups.class);
+			configuration = group.gotoConfiguration();
+			directoryServerSettings = configuration.gotoDirectoryServerSettings(prop.getProperty("Version"));
+			configuration = directoryServerSettings.disableAutoSync(prop.getProperty("Password"));
+			group = configuration.gotoGroups();
+			//Get the imported group details
+			impGrpDetails = group.getImportedGroupDetails(newGroupName);
+			//Get DN value of each member of the Group from LDAP
+			groupMembers = util.getGroupMembers(dirCon, 
+					impGrpDetails.get("groupName").substring(0, impGrpDetails.get("groupName").indexOf("_")), 
+					impGrpDetails.get("DN"));
+			//Get more details of each member of the Group from the LDAP
+			empDetails = util.getEmployeeDetails(dirCon, groupMembers);
+			for(String user : empDetails.keySet()){
+				System.out.println("Member Detais from LDAP");
+				System.out.println("sn: "+empDetails.get(user).get("sn")+", givenName: "+empDetails.get(user).get("givenName")
+						+", userPrincipalName: "+empDetails.get(user).get("userPrincipalName")+", " +
+								"mail: "+empDetails.get(user).get("mail"));
+			}
+			System.out.println();
+			//Now get the Members details from Database and verify the buddyName mapping of each member
+			for(String employee : empDetails.keySet()){
+				if(employee.equalsIgnoreCase("ldapAutomation1@lcsdomainad.com")
+						 || employee.equalsIgnoreCase("ldapAutomation2@lcsdomainad.com")){
+					testResult = testResult & util.isEmployeeDelted(stmt, empDetails.get(employee).get(prop.get("EmployeeID")));
+				}
+			}
+			
+			if(testResult){
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+				System.out.println("Scenario 5: Disable fist and second employee and the sync the group");
+				System.out.println("Pass");
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+			}else{
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+				System.out.println("Scenario 5: Disable fist and second employee and the sync the group");
+				System.out.println("Failed");
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+				brow.closeBrowser();
+				db.closeConnection(con);
+				dirCon.close();
+				return;
+			}
+			
+			//Scenario 6
+			//Remove buddyName Mapping fields and re-sync the group
+			//Go to Directory Server Settings and remove the BuddyName Mappings from Directory Field Mapping
+			configuration = group.gotoConfiguration();
+			directoryServerSettings = configuration.gotoDirectoryServerSettings(prop.getProperty("Version"));
+			configuration = directoryServerSettings.resetLDAPDirectoryFieldMapping(prop.getProperty("Password"), prop.getProperty("Version"),
+					prop.getProperty("DirectoryDefinition"));
+			group = configuration.gotoGroups();
+			impo = group.gotoImport();
+			syncGroups = impo.gotoSyncPreviouslyImportedGroups(prop.getProperty("DirectoryDefinition"));
+			group = syncGroups.syncImportedGroup(newGroupName);
+			Thread.sleep(5000);
+			//Get the imported group details
+			impGrpDetails = group.getImportedGroupDetails(newGroupName);
+			//Get DN value of each member of the Group from LDAP
+			groupMembers = util.getGroupMembers(dirCon, 
+					impGrpDetails.get("groupName").substring(0, impGrpDetails.get("groupName").indexOf("_")), 
+					impGrpDetails.get("DN"));
+			//Get more details of each member of the Group from the LDAP
+			empDetails = util.getEmployeeDetails(dirCon, groupMembers);
+			for(String user : empDetails.keySet()){
+				System.out.println("Member Detais from LDAP");
+				System.out.println("sn: "+empDetails.get(user).get("sn")+", givenName: "+empDetails.get(user).get("givenName")
+						+", userPrincipalName: "+empDetails.get(user).get("userPrincipalName")+", " +
+								"mail: "+empDetails.get(user).get("mail"));
+			}
+			System.out.println();
+			//Now get the Members details from Database and verify the buddyName mapping of each member
+			int networkID = util.getNetworkID(stmt, prop.getProperty("Network"));
+			for(String employee : empDetails.keySet()){
+				testResult = testResult & util.isBuddyNameMappingRemoved(stmt, empDetails.get(employee).get(prop.get("EmployeeID")), networkID);
+			}
+			
+			if(testResult){
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+				System.out.println("Scenario 6: Remove buddyName Mapping fields and re-sync the group and verify in Database");
+				System.out.println("Pass");
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+			}else{
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+				System.out.println("Scenario 6: Remove buddyName Mapping fields and re-sync the group and verify in Database");
+				System.out.println("Failed");
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+				brow.closeBrowser();
+				db.closeConnection(con);
+				dirCon.close();
+				return;
+			}
+			
+			//Scenario: 7
+			//Create a Group with parenthesis in the name and add two employees and import
+			groupDNSpecial = "CN="+newGroupNameSpl+","+prop.getProperty("BaseDN");
+			util.createSpecialGroup(groupDNSpecial, dirCon);
+			//Create 5 employees
+			domainName = util.getDomainName(prop.getProperty("BaseDN"));
+			for(int i=1001; i<1003; i++){
+				userAttributes = util.getUserAttributes(i+1, domainName);
+				if(!util.createUser("CN="+employeeDN+(i+1)+","+prop.getProperty("BaseDN"), dirCon, userAttributes)){
+					System.out.println("Could not craete a subcontext");
+					brow.closeBrowser();
+					db.closeConnection(con);
+					dirCon.close();
+					return;
+				}
+				empDNs.add("CN="+employeeDN+(i+1)+","+prop.getProperty("BaseDN"));
+				//Add the employee to the created group
+				util.modifyAttributes(groupDNSpecial, dirCon, "Add", "member", "CN="+employeeDN+(i+1)+","+prop.getProperty("BaseDN"));
+				System.out.println();
+			}
+			//Set Directory Field Mapping
+			configuration = group.gotoConfiguration();
+			directoryServerSettings = configuration.gotoDirectoryServerSettings(prop.getProperty("Version"));
+			configuration = directoryServerSettings.setLDAPDirectoryFieldMapping(prop.getProperty("Password"), 
+					prop.getProperty("Network"), prop.getProperty("BuddyNameMapping"), 
+					prop.getProperty("DirectoryDefinition"), prop.getProperty("EmployeeID"));
+			//Go to Groups page to import a Group
+			group = configuration.gotoGroups();
+			impo = group.gotoImport();
+			importDirGrp = impo.searchByGroupName(newGroupNameSpl, prop.getProperty("DirectoryDefinition"));
+			group = importDirGrp.importGroup(newGroupNameSpl);
+			Thread.sleep(2000);
+			//Get the imported group details
+			impGrpDetails = group.getImportedGroupDetails(newGroupNameSpl);
+			//Get DN value of each member of the Group from LDAP
+			groupMembers = util.getGroupMembers(dirCon, 
+					impGrpDetails.get("groupName").substring(0, impGrpDetails.get("groupName").indexOf("_")), 
+					impGrpDetails.get("DN"));
+			//Get more details of each member of the Group from the LDAP
+			empDetails = util.getEmployeeDetails(dirCon, groupMembers);
+			for(String user : empDetails.keySet()){
+				System.out.println("Member Detais from LDAP");
+				System.out.println("sn: "+empDetails.get(user).get("sn")+", givenName: "+empDetails.get(user).get("givenName")
+						+", userPrincipalName: "+empDetails.get(user).get("userPrincipalName")+", " +
+								"mail: "+empDetails.get(user).get("mail"));
+			}
+			System.out.println();
+			//Now get the Members details from Database and verify the buddyName mapping of each member
+			for(String employee : empDetails.keySet()){
+				ArrayList<String> values = util.getEmployeeDetails(stmt, empDetails.get(employee).get(prop.getProperty("EmployeeID")));
+				buddyNameMappingDetails = util.getBuddyNameDetails(stmt, values.get(0));
+				System.out.println("For employee: "+ employee +", the following details have been mapped");
+				System.out.println("FirstName: " + values.get(1)+ ", LastName: "+ values.get(2));
+				testResult = testResult & util.verifyEmployeeFirstNameAndLastName(values, empDetails.get(employee).get("givenName"), 
+						empDetails.get(employee).get("sn"));
+				if(testResult){
+					System.out.println("First Name and Last Name are matching");
+				}
+				flag = false;
+				if(buddyNameMappingDetails.size() == 0){
+					System.out.println("BuddyName Mapping value is 0");
+					testResult = false;
+				}else{
+					for(String buddyName : buddyNameMappingDetails.keySet()){
+						if(util.verifyBuddyNameAndNetwok(buddyName, empDetails.get(employee).get(prop.get("BuddyNameMapping"))
+								, buddyNameMappingDetails.get(buddyName), prop.getProperty("Network"))){
+									flag = true;
+									break;
+								}
+					}
+					if(!flag){
+						testResult = false;
+					}else{
+						testResult = testResult & flag;
+					}
+				}
+				
+				if(testResult){
+					System.out.println("BuddyName and Network are matching for: "+employee);
+				}else{
+					System.out.println("Either BuddyName or Network is not matching for: "+employee);
+				}
+				System.out.println();
+			}
+			
+			if(testResult){
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+				System.out.println("Scenario 7: Create a Group with parenthesis in the name and add two employees and import");
+				System.out.println("Pass");
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+			}else{
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+				System.out.println("Scenario 7: Create a Group with parenthesis in the name and add two employees and import");
+				System.out.println("Failed");
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+				brow.closeBrowser();
+				db.closeConnection(con);
+				dirCon.close();
+				return;
+			}
+			
+			//Scenario: 1
+			//Manual Sync, checking for time taken to Sync 10,000 users
+			//Go to Groups page to import a Group
+			configuration = group.gotoConfiguration();
+			directoryServerSettings = configuration.gotoDirectoryServerSettings(prop.getProperty("Version"));
+			configuration = directoryServerSettings.resetLDAPDirectoryFieldMapping(prop.getProperty("Password"), prop.getProperty("Version"),
+					prop.getProperty("DirectoryDefinition"));
+			group = configuration.gotoGroups();
+			dirCon.close();
+			initialCount = util.getCurrentEmployeesCount(stmt);
+			//group = configuration.gotoGroups();
+			startTime = System.currentTimeMillis();
+			System.out.println("Start Time: "+startTime);//remove this
+			impo = group.gotoImport();
+			importDirGrp = impo.searchByGroupName(prop.getProperty("GroupName"), prop.getProperty("DirectoryDefinition"));
+			group = importDirGrp.importGroup(prop.getProperty("GroupName"));
+			Thread.sleep(5000);
+			//brow.closeBrowser();
+			if(util.isAllEmployeesLoaded(stmt, initialCount, Integer.parseInt(prop.getProperty("numberOfEmployees")))){
+				testResult = true;
+				endTime = System.currentTimeMillis();
+				long diff = endTime - startTime;
+				long diffInSecond = diff / 1000;
+				long diffInMinute = diff / (60 * 1000);
+				long diffInHour = diff / (60 * 60 * 1000);
+				System.out.println("Time Taken to Load "+Integer.parseInt(prop.getProperty("numberOfEmployees"))+" employees ");
+				System.out.println(diffInHour+" Hours "+diffInMinute+" Minutes and "+diffInSecond%60+" Seconds");
+				System.out.println();
+			}else{
+				testResult = false;
+			}
+			
+			if(testResult){
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+				System.out.println("Scenario 1: Manual Sync, checking for time taken to Sync 10,000 users");
+				System.out.println("Pass");
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+			}else{
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+				System.out.println("Scenario 1: Manual Sync, checking for time taken to Sync 10,000 users");
+				System.out.println("Failed");
+				System.out.println("-------------------------------------------------------------------------------------------------------");
+				db.closeConnection(con);
+				//dirCon.close();
+				return;
+			}
+			System.out.println(empDNs);
+			dirCon = util.getDirContext(util.getLDAPURL(prop.getProperty("DirectoryServerHost")), 
+					prop.getProperty("AuthenticationType"), prop.getProperty("UserName"), prop.getProperty("Password"));
+			//Clean the LDAP
+			for(String empDN : empDNs){
+				dirCon.destroySubcontext(empDN);
+			}
+			//dirCon.destroySubcontext(empDNs.get(0));
+			//dirCon.destroySubcontext(empDNs.get(1));
+			//dirCon.destroySubcontext(empDNs.get(2));
+			//dirCon.destroySubcontext(empDNs.get(3));
+			//dirCon.destroySubcontext(empDNs.get(4));
+			//dirCon.destroySubcontext(empDNs.get(5));
+			//dirCon.destroySubcontext(empDNs.get(6));
+			dirCon.destroySubcontext(groupDN);
+//			dirCon.destroySubcontext(groupDNSpecial);
+			
+			//Set Auto Sync for LDAP
+			//group = configuration.gotoGroups(); 													////remove this
+			configuration = group.gotoConfiguration();
+			directoryServerSettings = configuration.gotoDirectoryServerSettings(prop.getProperty("Version"));
+			//Get current time and start Auto Sync at current time plus 2 minutes.
+			timeAMPMZone = util.getTime().split(" ");
+			configuration = directoryServerSettings.setEnableAutoSync(prop.getProperty("Password"), timeAMPMZone[2], "2", "minute(s)", 
+					timeAMPMZone[0], timeAMPMZone[1], "Any", prop.getProperty("DirectoryDefinition"));
+			
+			//Close the connections
+			brow.closeBrowser();				//remove this
+			db.closeConnection(con);
+			dirCon.close();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			brow.closeBrowser();
+			db.closeConnection(con);
+			try {
+				dirCon.close();
+			} catch (NamingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+		}finally {
+			if (input != null) {
+				try {
+					input.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+	}
+	
+}

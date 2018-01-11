@@ -1,0 +1,90 @@
+package Sam.com.actiance.Teams;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
+public class stringSet {
+	public String getMsg1(){
+		return "Vantage automation" + getCurrentTimeStamp();
+	}
+	public String getMsg2(){
+		return "Vantage automation reply" + getCurrentTimeStamp();
+	}
+	public String getMsg3(){
+		return "Vantage automation reply from 3rd user" + getCurrentTimeStamp();
+	}
+	
+	public String getMultibyte()throws FileNotFoundException{
+          String content = new Scanner(new File("D:\\Automation code\\Teams\\Links\\MULTIBYTE.txt")).useDelimiter("\\Z").next();
+          
+          System.out.println(content);
+		
+		return content + getCurrentTimeStamp();
+		
+	}
+	public String getMultibyte1()throws FileNotFoundException{
+        String content = new Scanner(new File("D:\\Automation code\\Teams\\Links\\MULTIBYTE1.txt")).useDelimiter("\\Z").next();
+		
+		return content + getCurrentTimeStamp();
+		
+	}
+	
+	public String getUTF8()throws FileNotFoundException{
+        String content = new Scanner(new File("D:\\Automation code\\Teams\\Links\\UTF8.txt")).useDelimiter("\\Z").next();
+		
+		//return content + getCurrentTimeStamp();
+        return content;
+	}
+	
+	
+/*	public String getmixed1()throws FileNotFoundException{
+        String content = new Scanner(new File("D:\\arun\\ALLMIXED.txt")).useDelimiter("\\Z").next();
+		
+		return content + getCurrentTimeStamp();
+		
+	}*/
+	
+	public String getJAVA()throws FileNotFoundException{
+        String content = new Scanner(new File("D:\\Automation code\\Teams\\Links\\JAVA.txt")).useDelimiter("\\Z").next();
+		
+		return content + getCurrentTimeStamp();
+		
+	}
+	
+	public String getHyperlink(){
+		return "http://www.bing.com/search?q=googletranslator&src=IE-TopResult&FORM=IETR02&conversationid=";
+	}
+	public String getXML() throws FileNotFoundException{
+		String content = new Scanner(new File("D:\\Automation code\\Teams\\Links\\XML.txt")).useDelimiter("\\Z").next();
+		
+		return content;
+	}
+	
+	public String getHTML() throws FileNotFoundException{
+		String content = new Scanner(new File("D:\\Automation code\\Teams\\Links\\HTML.txt")).useDelimiter("\\Z").next();
+	
+		return content + getCurrentTimeStamp();
+	}
+	public String getNumber() throws FileNotFoundException{
+		String content = new Scanner(new File("D:\\Automation code\\Teams\\Links\\Numbers.txt")).useDelimiter("\\Z").next();
+	
+		//return content + getCurrentTimeStamp();
+		return content;
+	}
+	public String getUTF(){
+		return "function writeUTF8File($filename,$content)" + getCurrentTimeStamp();
+	}
+	public String getAllMixed(){
+		return "Normal Bold 1 http://www.wordtracker.com/academy/seo-clean-urls " + getCurrentTimeStamp();
+	}
+	public long getCurrentTimeStamp()
+	{
+	return System.nanoTime();
+	}
+	
+	public static void main(String[] args) throws FileNotFoundException{
+		stringSet set = new stringSet();
+		System.out.println(set.getHyperlink());
+	}
+}

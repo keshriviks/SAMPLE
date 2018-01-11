@@ -1,0 +1,53 @@
+package com.actiance.pageLibrary;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+public class APINetworkRegistration extends TestBase {
+
+	WebDriver driver;
+	WebDriverWait wait;
+	
+	@FindBy(id="add")
+	 WebElement ClickOnAdd;
+	
+	@FindBy(id="import")
+	 WebElement ImporterSettings ;
+	
+	@FindBy(linkText="API Network Registration")
+	 WebElement NetworkRegistration;
+	
+	@FindBy(id="name")
+	 WebElement Networkname;
+	
+	@FindBy(id="description")
+	 WebElement description;
+	
+	@FindBy(xpath=".//*[@id='selNetworkType']")
+	 WebElement NetworkType;
+	
+	@FindBy(id="modalities")
+	 WebElement Modality;
+	
+	public APINetworkRegistration(WebDriver driver){
+		this.driver = driver;
+		PageFactory.initElements(driver, this);
+	}
+	
+	public void selectModality(){
+		Modality.click();
+		Select network= new Select(Modality);
+		network.selectByVisibleText(getObject("modality"));
+	}
+	
+	public void CReateCustomNetwork(){
+		ClickOnAdd.click();
+		Networkname.sendKeys(getObject("networkName"));
+		ImporterSettings.click();
+	}
+}
+

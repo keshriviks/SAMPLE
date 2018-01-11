@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+  
+<suite name="Import_IM">
+<!-- YellowJacket,Instant BB, Pivot, Indii -->
+		<parameter name="networkName" value="Instant BB"/>
+		<parameter name="vantageView" value="BB"/>
+		<parameter name="folderLocation" value="D:\BBmail test bbmail\Instant Message_BB" />
+		<parameter name="dbType" value="MSSQL"/>
+		<parameter name="dbName" value="Mahi_OCTMU" />
+		<parameter name="dbUserName" value="sa"/>
+		<parameter name="dbPassword" value="FaceTime@123"/>
+		<parameter name="dbHost" value="192.168.126.204"/>
+		<parameter name="vantage" value="192.168.119.137"/>
+		<parameter name="useEmailIdInsteadOfBuddyName" value="false"/>
+		<parameter name="createInternalEmp" value="false"/>
+		<parameter name="userFileLocation" value="D:\Test Data\AutoMapping_BB_InstantMessage\userFile\user.CSV"></parameter>
+		
+		
+  <test name="IM">
+  
+		<classes>
+	   	     <class name="com.actiance.test.importer.IM.tests.ImporterIMTest" />
+	     </classes>  
+  </test>
+</suite>

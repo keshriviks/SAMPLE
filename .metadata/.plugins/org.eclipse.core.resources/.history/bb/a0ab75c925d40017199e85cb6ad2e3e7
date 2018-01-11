@@ -1,0 +1,67 @@
+package com.actiance.Teams.Functionality;
+
+import java.io.IOException;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+
+
+
+public class LoginPageNEW extends TestBase{
+
+WebDriver driver;
+	
+	@FindBy(id="otherTileText")
+	WebElement NewAccount;
+	
+	@FindBy(xpath="has-focus placeholder ltr_override")
+	WebElement UserId;
+	
+	@FindBy(xpath=".//*[@id='idSIButton9']")
+	WebElement nextbutton1;
+	
+	@FindBy(xpath=".//*[@id='i0281']/div[1]/div/div[1]/div[2]/div/div/div[3]/div/div[2]/div/div")
+	WebElement password;
+	
+	@FindBy(id="idSIButton9")
+	WebElement SignIN;
+	
+	@FindBy(xpath=".//*[@id='personDropdown']")
+	WebElement UserIcon;
+	
+	@FindBy(xpath=".//*[@id='logout-button']")
+	WebElement logoutButton;
+	
+	public LoginPageNEW(WebDriver driver){
+		this.driver = driver;
+		PageFactory.initElements(driver, this);
+	}
+		
+	public void loginToApplication() throws InterruptedException, IOException{
+		
+		loadData();
+		
+		//log("cliked on sign in and object is:-"+signIn.toString());
+		NewAccount.click();
+		UserId.sendKeys(getObject("userName"));
+		//log("entered email address:-"+UserName+" and object is "+UserID.toString());
+		
+		password.sendKeys(getObject("passwrd"));
+		//log("entered password:-"+password+" and object is "+Password.toString());
+		Thread.sleep(20000);
+		SignIN.click();
+		Thread.sleep(40000);
+		System.out.println("clicked on chat room helloooooo");
+		//log("clicked on submit button and object is:-"+SignIN.toString());
+	}
+	
+public void logoutApps() throws InterruptedException{
+	UserIcon.click();
+	logoutButton.click();
+	Thread.sleep(5000);
+		
+	}
+	
+}

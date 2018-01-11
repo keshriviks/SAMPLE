@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite thread-count="3" guice-stage="DEVELOPMENT" name="Failed suite [XMLGeneration]" parallel="methods" data-provider-thread-count="1">
+  <test name="Test(failed)" parallel="methods">
+    <classes>
+      <class name="Sam.com.actiance.Teams.test1.Channel">
+        <methods>
+          <include name="Channel"/>
+        </methods>
+      </class> <!-- Sam.com.actiance.Teams.test1.Channel -->
+    </classes>
+  </test> <!-- Test(failed) -->
+</suite> <!-- Failed suite [XMLGeneration] -->

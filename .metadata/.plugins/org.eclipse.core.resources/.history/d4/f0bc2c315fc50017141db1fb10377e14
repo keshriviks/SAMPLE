@@ -1,0 +1,266 @@
+package com.actiance.APIs;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
+import org.openqa.selenium.WebDriver;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+//import Sam.com.actiance.Teams.TestBase;
+//import Sam.com.actiance.Teams.UiActions.ChatRoomPage;
+//import Sam.com.actiance.Teams.UiActions.LoginPage;t
+//import Sam.com.actiance.Teams.UiActions.TeamsHomePage;
+
+import com.independentsoft.exchange.FindFolderResponse;
+import com.independentsoft.exchange.FindItemResponse;
+import com.independentsoft.exchange.IsGreaterThanOrEqualTo;
+import com.independentsoft.exchange.Message;
+import com.independentsoft.exchange.MessagePropertyPath;
+import com.independentsoft.exchange.Service;
+import com.independentsoft.exchange.ServiceException;
+import com.independentsoft.exchange.StandardFolder;
+
+public class TestTestng extends TestBase{
+ 
+ LoginPage loginpage;
+ TeamsHomePage teamshomepage;
+ ChatRoomPage chatroompage;
+ //Long t=System.currentTimeMillis();
+ 
+ 
+	@BeforeMethod
+	
+	public void setUp() throws IOException, InterruptedException{
+     init();
+	}
+	
+	
+     @Test(priority=1,enabled=false)
+     public void OneChatRoom() throws InterruptedException, IOException{
+    	 String text = getObject("chatInput")+t;
+    	 loginpage= new LoginPage(driver);
+    	 teamshomepage =new TeamsHomePage(driver);
+    	 chatroompage=new ChatRoomPage(driver);
+    	 
+    	 loginpage.loginToApplication();
+    	 teamshomepage.clickOnChatRoom();
+    	 chatroompage.clickOne2One();
+    	 long messageSentTime = chatroompage.enterOnChatTextOne2One(text);
+    	 
+    	 Thread.sleep(3000);
+    	
+    	 System.out.println("======================================================");
+    	 System.out.println("====================EWS Validation for Nway ====================");
+    	 System.out.println("======================================================");
+    	 
+    	 try
+         {
+             Service service = new Service("https://outlook.office365.com/EWS/Exchange.asmx", "achandra@actiance.co.in", "FaceTime@123");
+
+             Calendar localCalendar = Calendar.getInstance();
+             localCalendar.add(Calendar.MINUTE, -2);
+
+             Date time = localCalendar.getTime();
+             
+             String msgToValidate = text;
+             
+             System.out.println("Message sent" + msgToValidate);
+
+             IsGreaterThanOrEqualTo restriction = new IsGreaterThanOrEqualTo(MessagePropertyPath.RECEIVED_TIME, time);
+             FindFolderResponse findFolderResponse1 = service.findFolder(StandardFolder.CONVERSATION_HISTORY);
+             FindItemResponse response = service.findItem(findFolderResponse1.getFolders().get(0).getFolderId(), MessagePropertyPath.getAllPropertyPaths(), restriction);
+ System.out.println(response.getItems().size());
+ boolean found = false;
+
+ 
+ long searchEndTime = 0;
+ long actualReceiveTime = 0;
+
+ System.out.println("Search started : "+messageSentTime);
+ int k =0;
+ while(!found){
+ 	
+ 	System.out.println(k++);
+             for (int i = 0; i < response.getItems().size(); i++)
+             {
+                 if (response.getItems().get(i) instanceof Message)
+                 {
+                     Message message = (Message) response.getItems().get(i);
+
+                    // System.out.println("Subject = " + message.getSubject());
+                     //System.out.println("ReceivedTime = " + message.getReceivedTime());
+
+                     if (message.getFrom() != null)
+                     {
+                         System.out.println("From = " + message.getFrom().getName());
+                         
+                     }
+      String fromMB =  message.getBodyPlainText();
+                     System.out.println("Body Preview = " +fromMB);
+                     if(fromMB.equals(msgToValidate))
+                     {
+                    	 
+                    	 
+                    	actualReceiveTime = message.getReceivedTime().getTime();
+                    	 System.out.println("ReceivedTime = " +actualReceiveTime);
+                    	 /*DateTimeFormatter formatter = DateTimeFormatter.ofPattern ( "EEE MMM d HH:mm:ss zzz yyyy" , Locale.ENGLISH );
+                    	 long epoch = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").parse("01/01/1970 01:00:00").getTime() / 1000;
+                    	 searchEndTime = System.currentTimeMillis();*/
+                     	found = true;
+                     	
+                     }
+                     System.out.println("----------------------------------------------------------------");
+                 }
+             }
+   Thread.sleep(5000);          
+ }
+ System.out.println("Match Found at started : "+searchEndTime);
+
+ System.out.println("Time taken :" + (actualReceiveTime - messageSentTime));
+
+         }
+         catch (ServiceException e)
+         {
+             System.out.println(e.getMessage());
+             System.out.println(e.getXmlMessage());
+
+             e.printStackTrace();
+         }
+    	 
+    	 
+    	 
+    	  }
+     
+     @Test(priority=3,enabled=true)
+     public void NwayChat() throws InterruptedException, IOException, Throwable{
+    	 String text = getObject("chatInput")+t;
+    	 loginpage= new LoginPage(driver);
+    	 teamshomepage =new TeamsHomePage(driver);
+    	 chatroompage=new ChatRoomPage(driver);
+    	 
+    	 loginpage.loginToApplication();
+    	 teamshomepage.clickOnChatRoom();
+    	 chatroompage.NwayConversation();
+    	 long messageSentTime =chatroompage.enterOnChatTextNway(text);
+    	 
+    	 System.out.println("Sent Time "+messageSentTime);
+
+    	 Thread.sleep(3000);
+     	
+    	 System.out.println("======================================================");
+    	 System.out.println("====================EWS Validation====================");
+    	 System.out.println("======================================================");
+    	 
+     
+
+    	 try
+         {
+             Service service = new Service("https://outlook.office365.com/EWS/Exchange.asmx", "achandra@actiance.co.in", "FaceTime@123");
+
+             Calendar localCalendar = Calendar.getInstance();
+             localCalendar.add(Calendar.MINUTE, -5);
+
+             Date time = localCalendar.getTime();
+             
+             String msgToValidate = text;
+             
+             System.out.println("Message sent" + msgToValidate);
+
+             IsGreaterThanOrEqualTo restriction = new IsGreaterThanOrEqualTo(MessagePropertyPath.RECEIVED_TIME, time);
+             FindFolderResponse findFolderResponse1 = service.findFolder(StandardFolder.CONVERSATION_HISTORY);
+             FindItemResponse response = service.findItem(findFolderResponse1.getFolders().get(0).getFolderId(), MessagePropertyPath.getAllPropertyPaths(), restriction);
+ System.out.println(response.getItems().size());
+ boolean found = false;
+
+ 
+ long searchEndTime = 0;
+ long actualReceiveTime = 0;
+
+ System.out.println("Search started : "+messageSentTime);
+ int k =0;
+ while(!found){
+ 	
+ 	System.out.println(k++);
+             for (int i = 0; i < response.getItems().size(); i++)
+             {
+                 if (response.getItems().get(i) instanceof Message)
+                 {
+                     Message message = (Message) response.getItems().get(i);
+
+                    // System.out.println("Subject = " + message.getSubject());
+                     //System.out.println("ReceivedTime = " + message.getReceivedTime());
+
+                     if (message.getFrom() != null)
+                     {
+                         System.out.println("From = " + message.getFrom().getName());
+                         
+                     }
+      String fromMB =  message.getBodyPlainText();
+                     System.out.println("Body Preview = " +fromMB);
+                     if(fromMB.equals(msgToValidate))
+                     {
+                    	 
+                    	 
+                    	actualReceiveTime = message.getReceivedTime().getTime();
+                    	 System.out.println("ReceivedTime = " +actualReceiveTime);
+                    	 DateTimeFormatter formatter = DateTimeFormatter.ofPattern ( "EEE MMM d HH:mm:ss zzz yyyy" , Locale.ENGLISH );
+                    	 long epoch = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").parse("01/01/1970 01:00:00").getTime() / 1000;
+                    	 searchEndTime = System.currentTimeMillis();
+                     	found = true;
+                     	
+                     }
+                     System.out.println("----------------------------------------------------------------");
+                 }
+             }
+   Thread.sleep(5000);          
+ }
+ System.out.println("Match Found at started : "+searchEndTime);
+
+ System.out.println("Time taken :" + (actualReceiveTime - messageSentTime));
+
+         }
+         catch (ServiceException e)
+         {
+             System.out.println(e.getMessage());
+             System.out.println(e.getXmlMessage());
+
+             e.printStackTrace();
+         }
+    	 
+    	 
+    	 
+    	  }
+    	 
+    	 
+     
+     @Test(priority=2,enabled=false)
+     public void GroupConversation() throws InterruptedException, IOException{
+    	 String text = getObject("chatInput")+t;
+    	 loginpage= new LoginPage(driver);
+    	 teamshomepage =new TeamsHomePage(driver);
+    	 
+    	 loginpage.loginToApplication();
+    	 teamshomepage.clickOnGroupConversation();
+    	 teamshomepage.enterOnChatTextGroup(text);
+    	 
+    	 
+    	  	  	 
+     }
+     
+  /*   @AfterMethod
+     
+     public void logoutApplication() throws InterruptedException{
+    	 loginpage= new LoginPage(driver);
+    	 loginpage.logoutApps();
+    	 closeBrowser();
+     }*/
+     
+    
+
+}

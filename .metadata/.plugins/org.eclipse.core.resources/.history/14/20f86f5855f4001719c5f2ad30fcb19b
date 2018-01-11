@@ -1,0 +1,73 @@
+package com.actiance.pageLibrary;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+public class ImporterSetting {
+
+	WebDriver driver;
+	WebDriverWait wait;
+	
+	@FindBy(name="employeeSearchLocation")
+	 WebElement LDAPSearchlocation;
+	
+	@FindBy(name="employeeSearchFilter")
+	 WebElement LdapSearchFilter;
+	
+	@FindBy(name="employeeEmailDomains")
+	 WebElement Employeedomain;
+	
+	@FindBy(xpath=".//*[@id='content']/div[7]/table/tbody/tr/td[3]/input[2]")
+	 WebElement SelectImporter;
+
+	@FindBy(xpath=".//*[@id='content']/h2[3]/a")
+	 WebElement Setup;
+	
+	@FindBy(xpath=".//*[@id='section2']/table[1]/tbody/tr[1]/td[2]/input")
+	 WebElement Importerstatus;
+	
+	@FindBy(xpath=".//*[@id='section2']/table[1]/tbody/tr[2]/td[2]/input")
+	 WebElement Filelocation;
+	
+	@FindBy(xpath=".//*[@id='section2']/table[1]/tbody/tr[3]/td[2]/select/option")
+	 WebElement ServerId;
+	
+	@FindBy(xpath=".//*[@id='networkList']")
+	 WebElement Network;
+	
+	@FindBy(xpath=".//*[@id='xmlTypeList']")
+	 WebElement Type;
+	
+	@FindBy(xpath=".//*[@id='timeToProcessInters']")
+	 WebElement ImportingTime;
+	
+	@FindBy(xpath=".//*[@id='timezoneToProcessInters']")
+	 WebElement ImportingTimeZone;
+	
+	@FindBy(xpath=".//*[@id='btnApply']")
+	 WebElement OkButton;
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	public ImporterSetting(WebDriver driver){
+		this.driver = driver;
+		PageFactory.initElements(driver, this);
+	
+	}
+	
+}

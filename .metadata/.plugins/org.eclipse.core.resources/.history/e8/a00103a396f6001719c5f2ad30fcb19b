@@ -1,0 +1,23 @@
+package com.actiance.tests.LDAP.utils;
+
+public interface LDAPConstants {
+	
+	//Number of employees to create
+	public static final int noOfEmployees = 5;
+	//Group Name to create
+	public static final String newGroupName = "LDAPAutomation_1lac_";
+	//Employees First name, Last name and userPrincipal name
+	public static final String fName = "LDAP_New";
+	public static final String lName = "Automation";
+	public static final String userPrincipal = "ldapAutomation_New";
+	//UserAccountControl Value which is required to create a Normal user with Password never expires
+	//public static final String userAccount = "66048";
+	public static final String userAccount = "66080";
+	//UserAccountControl Value which is required for disabling a user
+	//public static final String userAccountDisable = "66050";
+	public static final String userAccountDisable = "546";
+	//Employee DN value in the LDAP 
+	public static final String employeeDN = "LDAP Automation New";
+	//Group Name containing parenthesis
+	public static final String newGroupNameSpl = "LDAP Automation (Special) Group";
+}

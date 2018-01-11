@@ -1,0 +1,13 @@
+	url=https://teams.microsoft.com
+	browser=chrome
+	userName=achandra@actiance.co.in
+	passwrd=FaceTime@123
+	chatInput=Hii
+	dbType=sql
+	dbserver=192.168.119.113:1433
+	dbname=Teamsdemo
+	username=sa
+	password=FaceTime@123
+	# for xml data is not coming in proper
+	# for smiley not able to validate
+	

@@ -1,0 +1,9 @@
+package Sam.com.actiance.Teams;
+
+public class teamsdelay {
+
+	DatabaseDetails db = new DatabaseDetails();
+	
+	
+	
+}

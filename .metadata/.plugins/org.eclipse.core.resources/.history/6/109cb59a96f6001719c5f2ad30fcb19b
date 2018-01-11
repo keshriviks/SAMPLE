@@ -1,0 +1,26 @@
+package com.actiance.tests.LDAP.utils;
+
+public interface LDAPConstants_BBEmail {
+	
+	//Number of employees to create
+	public static final int noOfEmployees = 20;
+	//Group Name to create
+	public static final String newGroupName = "INBBAutomappedGrp";
+	//Employees First name, Last name and userPrincipal name
+	public static final String fName = "AutFname";
+	public static final String lName = "AutLName";
+	public static final String userPrincipal = "INBloomberg";
+	//UserAccountControl Value which is required to create a Normal user with Password never expires
+	//public static final String userAccount = "66048";
+	public static final String userAccount = "66080";
+	//UserAccountControl Value which is required for disabling a user
+	//public static final String userAccountDisable = "66050";
+	public static final String userAccountDisable = "546";
+	//Employee DN value in the LDAP 
+	public static final String employeeDN = "BBEmail Automapped";
+	
+	public static String mappingMail = "bbMailAutomappedUser";
+	public static String mappingDomain= "actibank.com";
+	//Group Name containing parenthesis
+	public static final String newGroupNameSpl = "LDAP Automation (Special) Group";
+}

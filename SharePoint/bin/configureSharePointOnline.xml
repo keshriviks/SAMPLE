@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suite name="IM" verbose="1" >
+
+<parameter name = "vantageIP" value="192.168.121.31" />
+<parameter name = "additionalContentTypeFile" value="D:\\CustomContentTypes.xml" />
+<parameter name = "username" value = "achandra@actianceengg.com" />
+<parameter name = "password" value = "FaceTime@123" />
+<parameter name = "startArchiveDate" value = "02/02/2016" />
+
+  <test name="IM" >
+    <classes>
+      <class name="com.actiance.test.sharepointNew.selenium.SharePointConfiguration"/> 
+    </classes>
+ </test>
+</suite>

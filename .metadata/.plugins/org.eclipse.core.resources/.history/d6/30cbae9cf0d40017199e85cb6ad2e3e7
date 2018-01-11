@@ -1,0 +1,9 @@
+package Sam.com.actiance.Teams;
+
+import org.testng.annotations.Test;
+
+public class TestTestngTest {
+  @Test
+  public void f() {
+  }
+}

@@ -1,0 +1,76 @@
+package com.actiance.tests.LDAP.utils;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+public class Import {
+	WebDriver driver;
+	WebDriverWait wait;
+	
+	@FindBy(id="importGrp")
+	private WebElement impGrp;
+	
+	@FindBy(id="groupName")
+	private WebElement grpName;
+	
+	@FindBy(id="sync")
+	private WebElement syn;
+	
+	@FindBy(xpath="//input[@value='Continue...']")
+	private WebElement continu;
+	
+	@FindBy(name="dirSelect")
+	private WebElement directory;
+	
+	public Import(WebDriver driver){
+		this.driver = driver;
+		wait = new WebDriverWait(driver, 60);
+	}
+	
+	public void selectDirectory(String dirName){
+		wait.until(ExpectedConditions.visibilityOf(directory));
+		Select dropdown = new Select(directory);
+		dropdown.selectByVisibleText(dirName);
+	}
+	
+	public void clickSearchByGroupName(){
+		wait.until(ExpectedConditions.visibilityOf(impGrp));
+		impGrp.click();
+	}
+	
+	public void enterGroupName(String name){
+		wait.until(ExpectedConditions.visibilityOf(grpName));
+		grpName.clear();
+		grpName.sendKeys(name);
+	}
+	
+	public void clickSync(){
+		wait.until(ExpectedConditions.visibilityOf(syn));
+		syn.click();
+	}
+	
+	public void clickContinue(){
+		wait.until(ExpectedConditions.visibilityOf(continu));
+		continu.click();
+	}
+	
+	public ImportDirectoryGroups searchByGroupName(String name, String directory){
+		selectDirectory(directory);
+		clickSearchByGroupName();
+		enterGroupName(name);
+		clickContinue();
+		return PageFactory.initElements(driver, ImportDirectoryGroups.class);
+	}
+	
+	public SyncPreviouslyImportedGroups gotoSyncPreviouslyImportedGroups(String directory){
+		selectDirectory(directory);
+		clickSync();
+		clickContinue();
+		return PageFactory.initElements(driver, SyncPreviouslyImportedGroups.class);
+	}
+}

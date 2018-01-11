@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Copy element &apos;VerifyAllLinks2TelX.java&apos; to &apos;Sample/src/VantageUILinks&apos;&#x0D;&#x0A;- Original project: &apos;Sample&apos;&#x0D;&#x0A;- Destination element: &apos;Sample/src/VantageUILinks&apos;&#x0D;&#x0A;- Original element: &apos;Sample123.VerifyAllLinks2TelX.java&apos;" description="Copy compilation unit" destination="/src&lt;VantageUILinks" element1="/src&lt;Sample123{VerifyAllLinks2TelX.java" files="0" flags="589830" folders="0" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyResources" stamp="1508912326208" units="1" version="1.0"/>
+</session>

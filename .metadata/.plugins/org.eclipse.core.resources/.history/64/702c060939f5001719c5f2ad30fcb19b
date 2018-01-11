@@ -1,0 +1,66 @@
+package com.actiance.tests;
+
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+
+public class Samplelogin {
+	
+	public static void main(String[] args) throws InterruptedException, IOException {
+		
+	
+
+	System.setProperty("webdriver.chrome.driver", "D:\\Software\\chrome\\chromedriver.exe");
+	WebDriver driver = new ChromeDriver();
+	
+	
+	driver.manage().window().maximize();
+	driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+    driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+    driver.get("https://192.168.114.8:8443/ima/");
+    
+    driver.findElement(By.xpath("//input[@type='text']")).sendKeys("sysadmin");
+    driver.findElement(By.xpath("//input[@type='password']")).sendKeys("facetime");
+    driver.findElement(By.xpath("//input[@class='button']")).click();
+    
+   // Thread.sleep(3000);
+    driver.findElement(By.linkText("Configuration")).click();
+    driver.findElement(By.linkText("API Network Registration")).click();
+   
+    driver.findElement(By.id("add")).click();
+    driver.findElement(By.id("import")).click();
+  /* // driver.findElement(By.id("importFile")).click();
+    
+   
+    upload.sendKeys("D:\\Jive\\Registeration Api\\jiveApiImportShowContext.xml");
+    driver.findElement(By.id("submit")).click();
+    
+    driver.FileDetector = new LocalFileDetector();
+    FindElement(By.Id("fileField")).SendKeys(@"D:\\Jive\\Registeration Api\\jiveApiImportShowContext.xml"); 
+    FindElement(By.CssSelector("input[type='submit']")).Click();
+    
+   // driver.findElement(By.id("inputFile")).sendKeys("D:\\Jive\\Registeration Api\\jiveApiImportShowContext.xml");
+   
+    
+    WebElement uploadElement = driver.findElement(By.id("importFile"));
+    uploadElement.click();
+    // enter the file path onto the file-selection input field
+    uploadElement.sendKeys("D:\\Jive\\Registeration Api\\jiveApiImportShowContext.xml");
+
+    // check the "I accept the terms of service" check box
+    driver.findElement(By.id("terms")).click();
+
+    // click the "UploadFile" button
+    driver.findElement(By.name("send")).click(); 
+*/    
+    
+    driver.findElement(By.id("importFile")).click();
+    Runtime.getRuntime().exec("D:\\upload file\\uploadFile.exe");
+}
+
+}

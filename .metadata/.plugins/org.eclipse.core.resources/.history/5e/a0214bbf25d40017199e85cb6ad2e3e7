@@ -1,0 +1,8 @@
+package com.actiance.Teams.Functionality;
+
+public class Snippet {
+	public static void main(String[] args) {
+		NextButton
+	}
+}
+

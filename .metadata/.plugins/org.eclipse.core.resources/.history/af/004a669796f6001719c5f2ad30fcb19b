@@ -1,0 +1,51 @@
+package com.actiance.tests.LDAP.utils;
+
+import java.util.ArrayList;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+public class ImportDirectoryGroups {
+	WebDriver driver;
+	WebDriverWait wait;
+	
+	@FindBy(xpath="//input[contains(@value, 'Import Groups')]")
+	private WebElement importGrp;
+	
+	public ImportDirectoryGroups(WebDriver driver) {
+		this.driver = driver;
+		wait = new WebDriverWait(driver, 60);
+	}
+	
+	public void clickImportGroups(){
+		wait.until(ExpectedConditions.visibilityOf(importGrp));
+		importGrp.click();
+	}
+	
+	public void selectGroup(String name) throws InterruptedException{
+		wait.until(ExpectedConditions.visibilityOf(importGrp));
+		
+		String checkBoxAttribute;
+		
+		ArrayList<WebElement> rows = (ArrayList<WebElement>) driver.findElements(By.xpath("//div[@class='scrollingDiv']/table/tbody/tr"));
+		for(int i=3;i<rows.size();i++){
+			if(driver.findElement(By.xpath("//div[@class='scrollingDiv']/table/tbody/tr["+(i-1)+"]/td[2]")).getText().contains(name)){
+				checkBoxAttribute = driver.findElement(By.xpath("//div[@class='scrollingDiv']/table/tbody/tr["+(i-1)+"]/td[1]/input")).getAttribute("name");
+				driver.findElement(By.xpath("//div[@class='scrollingDiv']/table/tbody//input[@name='"+checkBoxAttribute+"']")).click();
+				Thread.sleep(2000);
+			}
+		}
+	}
+	
+	public Groups importGroup(String name) throws InterruptedException{
+		selectGroup(name);
+		clickImportGroups();
+		return PageFactory.initElements(driver, Groups.class);
+	}
+	
+}

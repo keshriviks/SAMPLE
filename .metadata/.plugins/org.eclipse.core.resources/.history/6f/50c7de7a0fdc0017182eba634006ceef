@@ -1,0 +1,10 @@
+package SampleTest.jenkins;
+
+public class Testjen {
+
+	
+	public void display() {
+		
+		System.out.println("Hello world");
+	}
+}

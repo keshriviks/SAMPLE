@@ -1,0 +1,48 @@
+package com.actiance.pageLibrary;
+
+import java.io.IOException;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+
+public class Login extends TestBase {
+	
+	@FindBy(xpath="//input[@type='text']")
+	 WebElement username;
+	
+	@FindBy(xpath="//input[@type='password']")
+	 WebElement Password;
+	
+	@FindBy(xpath="//input[@class='button']")
+	 WebElement submitLogin;
+
+	WebDriver driver;
+	WebDriverWait wait;
+	
+	public Login(WebDriver driver){
+		this.driver = driver;
+		PageFactory.initElements(driver, this);
+	
+	
+	
+	
+	
+	
+	
+	
+
+	public void loginToApplication() throws IOException, InterruptedException{
+		
+		loadData();
+		username.sendKeys(getObject("userName"));
+		Password.sendKeys(getObject("password"));
+		Thread.sleep(3000);
+		submitLogin.click();
+		
+	}
+
+}

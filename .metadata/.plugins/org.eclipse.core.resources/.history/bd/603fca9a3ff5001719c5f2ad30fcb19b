@@ -1,0 +1,84 @@
+package com.actiance.pageLibrary;
+
+import java.io.IOException;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+public class APINetworkRegistration extends TestBase {
+
+	WebDriver driver;
+	WebDriverWait wait;
+	
+	@FindBy(id="add")
+	 WebElement ClickOnAdd;
+	
+	@FindBy(id="import")
+	 WebElement ImporterSettings ;
+	
+	@FindBy(id="importFile")
+	 WebElement Choosefile ;
+	
+	@FindBy(linkText="API Network Registration")
+	 WebElement NetworkRegistration;
+	
+	@FindBy(id="name")
+	 WebElement Networkname;
+	
+	@FindBy(id="description")
+	 WebElement description;
+	
+	@FindBy(xpath=".//*[@id='selNetworkType']")
+	 WebElement NetworkType;
+	
+	@FindBy(id="modalities")
+	 WebElement Modality;
+	
+	@FindBy(xpath=".//*[@id='footerLeft']/input[1]")
+	 WebElement OkButton;
+	
+	@FindBy(xpath=".//*[@id='footerLeft']/div/input[2]")
+	 WebElement SaveButton;
+	
+	public APINetworkRegistration(WebDriver driver){
+		this.driver = driver;
+		PageFactory.initElements(driver, this);
+	}
+	
+	public void selectNetworkType(){
+		Select net= new Select(NetworkType);
+		net.selectByIndex(0);
+	}
+	
+	public void selectModality(){
+		Modality.click();
+		Select mod= new Select(Modality);
+		mod.selectByVisibleText(getObject("modality"));
+	}
+	
+	public void CReateCustomNetwork() throws InterruptedException, IOException{
+		ClickOnAdd.click();
+		Networkname.sendKeys(getObject("networkName"));
+		selectNetworkType();
+		selectModality();
+		Thread.sleep(2000);
+		ImporterSettings.click();
+		Thread.sleep(2000);
+		Choosefile.click();
+		
+		    //To upload a file using an AutoIT tool
+	        System.out.println("Status Ongoing");
+		    Runtime.getRuntime().exec("D:\\upload file\\uploadFile.exe");
+		    Thread.sleep(2000);
+		    System.out.println("Status Pass");
+		    
+		   // OkButton.click();
+		    Thread.sleep(2000);
+		   // SaveButton.click();
+	}
+}
+

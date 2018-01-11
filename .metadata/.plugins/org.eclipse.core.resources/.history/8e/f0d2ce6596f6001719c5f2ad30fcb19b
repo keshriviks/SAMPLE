@@ -1,0 +1,58 @@
+package com.actiance.tests.LDAP.utils;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+
+public class Configuration {
+	WebDriver driver;
+	WebDriverWait wait;
+
+	@FindBy(linkText="Directory Server Settings")
+	private WebElement DirSerSet;
+	
+	@FindBy(linkText="LDAP Settings")
+	private WebElement LDAPSet;
+	
+	@FindBy(linkText="Groups")
+	private WebElement groups;
+	
+	public Configuration(WebDriver driver){
+		this.driver = driver;
+		wait = new WebDriverWait(driver, 120);
+	}
+	
+	
+	public void clickDirectoryServerSettings(){
+		wait.until(ExpectedConditions.visibilityOf(DirSerSet));
+		DirSerSet.click();
+	}
+	
+	public void clickLDAPSet(){
+		wait.until(ExpectedConditions.visibilityOf(LDAPSet));
+		LDAPSet.click();
+	}
+	
+	public DirectoryServerSettings gotoDirectoryServerSettings(String version){
+		if(version.equalsIgnoreCase("Old")){
+			clickLDAPSet();
+		}else{
+			clickDirectoryServerSettings();
+		}
+		return PageFactory.initElements(driver, DirectoryServerSettings.class);
+	}
+	
+	public void clickGroups(){
+		wait.until(ExpectedConditions.visibilityOf(groups));
+		groups.click();
+	}
+	
+	public Groups gotoGroups(){
+		clickGroups();
+		return PageFactory.initElements(driver, Groups.class);
+	}
+}

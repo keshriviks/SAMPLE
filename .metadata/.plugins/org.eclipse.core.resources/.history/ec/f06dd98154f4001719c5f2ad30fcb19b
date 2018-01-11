@@ -1,0 +1,42 @@
+package com.actiance.pageLibrary;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+public class ImporterSetting {
+
+	WebDriver driver;
+	WebDriverWait wait;
+	
+	@FindBy(name="employeeSearchLocation")
+	 WebElement LDAPSearchlocation;
+	
+	@FindBy(name="employeeSearchFilter")
+	 WebElement LdapSearchFilter;
+	
+	@FindBy(name="employeeEmailDomains")
+	 WebElement Employeedomain;
+	
+	@FindBy(xpath=".//*[@id='content']/div[7]/table/tbody/tr/td[3]/input[2]")
+	 WebElement SelectImporter;
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	public ImporterSetting(WebDriver driver){
+		this.driver = driver;
+		PageFactory.initElements(driver, this);
+	
+	}
+	
+}

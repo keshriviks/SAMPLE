@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="SharePoint New Approach">
+	
+	<parameter name="dbUrl" value="jdbc:sqlserver://192.168.117.11:1433;database=FS-2017"/>
+	<parameter name="dbUser" value="sa"/>
+	<parameter name="dbPassword" value="FaceTime@123"/>
+	<parameter name="CSVFile" value="C:\Users\VKeshri\automation\CVSROOT\Automation\VantageAutomation\src\main\resources\SharepointNewApproachSiteLevelLists_V1.1.CSV"/>
+	
+	<test name="SharePoint Test">
+	
+		<classes>
+			<class name="com.actiance.test.sharepointNewApproach.tests.TopSiteLevelLists"/>
+		</classes>
+	
+	</test>
+</suite>

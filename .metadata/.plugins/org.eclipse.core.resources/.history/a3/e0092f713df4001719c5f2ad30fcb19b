@@ -1,0 +1,11 @@
+	url=https://teams.microsoft.com
+	browser=chrome
+	userName=sysadmin
+	password=facetime
+	
+	dbType=sql
+	dbserver=766:1433
+	dbname=Teamsdemo
+	username=sa
+
+	

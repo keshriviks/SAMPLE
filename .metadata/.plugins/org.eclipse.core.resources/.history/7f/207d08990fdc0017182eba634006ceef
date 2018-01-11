@@ -1,0 +1,9 @@
+package SampleTest.jenkins;
+
+import org.testng.annotations.Test;
+
+public class TestjenTest {
+  @Test
+  public void f() {
+  }
+}

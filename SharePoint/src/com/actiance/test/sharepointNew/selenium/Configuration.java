@@ -1,0 +1,55 @@
+package com.actiance.test.sharepointNew.selenium;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+
+
+public class Configuration {
+	
+	
+		WebDriver driver;
+		WebDriverWait wait;
+		
+		@FindBy(linkText="Configuration")
+		private WebElement Configuration;
+		
+		@FindBy(xpath="//a[@href='/ima/defineAdditionalContent.do?method=load']")
+		private WebElement sharepointAdditional ;
+		
+		@FindBy(xpath="//a[@href='/ima/editFarmList.do?method=list']")
+		private WebElement sharepointCompliance ;
+		
+		public Configuration(WebDriver driver){
+			this.driver = driver;
+			wait = new WebDriverWait(driver, 120);
+		}
+		public void clickConfiguration(){
+			wait.until(ExpectedConditions.visibilityOf(Configuration));
+			Configuration.click();
+		}
+		public void clickSharepointAdditional(){
+			wait.until(ExpectedConditions.visibilityOf(sharepointAdditional));
+			sharepointAdditional.click();
+		}
+		
+		public SharepointAdditional gotoSharepointAdditional(){
+			clickSharepointAdditional();
+			return PageFactory.initElements(driver, SharepointAdditional.class);
+		}
+		
+		public void clickSharepointCompliance(){
+			wait.until(ExpectedConditions.visibilityOf(sharepointCompliance));
+			sharepointCompliance.click();
+		}
+		
+		public SharepointCompliance gotoSharepointCompliance(){
+			clickSharepointCompliance();
+			return PageFactory.initElements(driver, SharepointCompliance.class);
+		}
+
+}

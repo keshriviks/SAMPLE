@@ -1,0 +1,646 @@
+package com.actiance.tests.LDAP.utils;
+
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.ui.Select;
+
+import static org.testng.Assert.assertTrue;;
+
+public class DirectoryServerSettings {
+	WebDriver driver;
+	WebDriverWait wait;
+	
+	@FindBy(xpath="//select[@name='dirSelect']")
+	private WebElement directoryName;
+	
+	@FindBy(xpath="//input[contains(@value, 'Go')]")
+	private WebElement go;
+	
+	@FindBy(id="dirDisableBox")
+	private WebElement directoryStatus;
+	
+	@FindBy(id="primaryDirBox")
+	private WebElement globalPrimary;
+	
+	@FindBy(id="ActiveDirectory")
+	private WebElement activeDirectory;
+	
+	@FindBy(id="iPlanet")
+	private WebElement iPlanet;
+	
+	@FindBy(id="Domino")
+	private WebElement domino;
+	
+	@FindBy(id="Tivoli")
+	private WebElement tivoli;
+	
+	@FindBy(id="NovelleDirectory")
+	private WebElement novelleDirectory;
+	
+	@FindBy(id="Open")
+	private WebElement open;
+	
+	@FindBy(id="SmartCloud")
+	private WebElement smartCloud;
+	
+	@FindBy(id="dirServerHost")
+	private WebElement serverHost;
+	
+	@FindBy(id="dirServerPort")
+	private WebElement port;
+	
+	@FindBy(id="baseDN")
+	private WebElement baseDN;
+	
+	@FindBy(id="authType")
+	private WebElement authType;
+	
+	@FindBy(id="dirUsername")
+	private WebElement userName;
+	
+	@FindBy(id="dirPassword")
+	private WebElement password;
+	
+	@FindBy(xpath="//input[contains(@value, 'Test Connection')]")
+	private WebElement testConnection;
+	
+	@FindBy(xpath="//input[contains(@value, 'OK')]")
+	private WebElement ok;
+	
+	@FindBy(xpath="//div[@class='messageBar']")
+	private WebElement messageBar;
+	
+	@FindBy(id="disclose4")
+	private WebElement dirFieldMap;
+	
+	@FindBy(id="employeeIDAttr")
+	private WebElement employeeID;
+	
+	@FindBy(xpath="//input[@name='aimBuddy']")
+	private WebElement aim;
+	
+	@FindBy(xpath="//input[@name='msnBuddy']")
+	private WebElement msn;
+	
+	@FindBy(xpath="//input[@name='yahooBuddy']")
+	private WebElement yahoo;
+	
+	@FindBy(xpath="//input[@name='sametimeBuddy']")
+	private WebElement sametime;
+	
+	@FindBy(xpath="//input[@name='alternateSametimeBuddy']")
+	private WebElement alterSametime;
+	
+	@FindBy(xpath="//input[@name='reutersBuddy']")
+	private WebElement reuter;
+	
+	@FindBy(xpath="//input[@name='lcsBuddy']")
+	private WebElement lcsBuddy;
+	
+	@FindBy(xpath="//input[@name='lcsPhone']")
+	private WebElement lcsPhone;
+	
+	@FindBy(xpath="//input[@name='jabberBuddy']")
+	private WebElement jabber;
+	
+	@FindBy(xpath="//input[@name='gtalkBuddy']")
+	private WebElement google;
+	
+	@FindBy(xpath="//input[@name='blackberryPINNumber']")
+	private WebElement blackPIN;
+	
+	@FindBy(xpath="//input[@name='blackberrySMSNumber']")
+	private WebElement blackPhone;
+	
+	@FindBy(xpath="//input[@name='blackberryName_ID']")
+	private WebElement blackName;
+	
+	@FindBy(xpath="//input[@name='skypeBuddy']")
+	private WebElement skype;
+	
+	@FindBy(xpath="//input[@name='sharepointBuddy']")
+	private WebElement sharepoint;
+	
+	@FindBy(xpath="//input[@name='connectionsBuddy']")
+	private WebElement connection;
+	
+	@FindBy(xpath="//input[@name='alternateConnectionsBuddy']")
+	private WebElement alterConnection;
+	
+	@FindBy(id="disclose2")
+	private WebElement dailyAutoSync;
+	
+	@FindBy(id="enableFilter")
+	private WebElement enableAutoSync;
+	
+	@FindBy(id="timezoneToSyncDir")
+	private WebElement timezone;
+	
+	@FindBy(id="every")
+	private WebElement occursEvery;
+	
+	@FindBy(id="timeToSyncDirByMinHour")
+	private WebElement time;
+	
+	@FindBy(id="hoursOrMins")
+	private WebElement hourOrMin;
+	
+	@FindBy(id="startingAt")
+	private WebElement startAt;
+	
+	@FindBy(id="startAMPM")
+	private WebElement startAMPM;
+	
+	@FindBy(id="endingAt")
+	private WebElement endAt;
+	
+	@FindBy(id="endAMPM")
+	private WebElement endAMPM;
+	
+	@FindBy(id="serverIdsToSync")
+	private WebElement serverID;
+	
+	public DirectoryServerSettings(WebDriver driver){
+		this.driver = driver;
+		wait = new WebDriverWait(driver, 60);
+	}
+	
+	public void selectDerectoryDefinition(String dir){
+		wait.until(ExpectedConditions.visibilityOf(go));
+		Select dropdown = new Select(directoryName);
+		dropdown.selectByVisibleText(dir);
+	}
+	
+	public void clickGo(){
+		wait.until(ExpectedConditions.visibilityOf(go));
+		go.click();
+	}
+	
+	public void enableDirectoryStatus(){
+		wait.until(ExpectedConditions.visibilityOf(directoryStatus));
+		if(!directoryStatus.isSelected()){
+			directoryStatus.click();
+		}
+	}
+	
+	public void enableGlobalPrimary(){
+		wait.until(ExpectedConditions.visibilityOf(globalPrimary));
+		if(!globalPrimary.isSelected()){
+			globalPrimary.click();
+		}
+	}
+	
+	public void selectDirectoryServerType(String type){
+		switch (type) {
+		case "Microsoft":
+			wait.until(ExpectedConditions.visibilityOf(activeDirectory));
+			activeDirectory.click();
+			break;
+		
+		case "Sun":
+			wait.until(ExpectedConditions.visibilityOf(iPlanet));
+			iPlanet.click();
+			break;
+			
+		case "Lotus":
+			wait.until(ExpectedConditions.visibilityOf(domino));
+			domino.click();
+			break;
+			
+		case "Tivoli":
+			wait.until(ExpectedConditions.visibilityOf(tivoli));
+			tivoli.click();
+			break;
+			
+		case "Novel":
+			wait.until(ExpectedConditions.visibilityOf(novelleDirectory));
+			novelleDirectory.click();
+			break;
+			
+		case "Open":
+			wait.until(ExpectedConditions.visibilityOf(open));
+			open.click();
+			break;
+			
+		case "Smart":
+			wait.until(ExpectedConditions.visibilityOf(smartCloud));
+			smartCloud.click();
+			break;
+		default:
+			break;
+		}
+	}
+	
+	public void enterHost(String host){
+		wait.until(ExpectedConditions.visibilityOf(serverHost));
+		serverHost.clear();
+		serverHost.sendKeys(host);
+	}
+	
+	public void enterPort(String portNo){
+		wait.until(ExpectedConditions.visibilityOf(port));
+		port.clear();
+		port.sendKeys(portNo);
+	}
+	
+	public void enterBaseDN(String baseDNValue){
+		wait.until(ExpectedConditions.visibilityOf(baseDN));
+		baseDN.clear();
+		baseDN.sendKeys(baseDNValue);
+	}
+	
+	public void selectAuthenticationType(String auth){
+		wait.until(ExpectedConditions.visibilityOf(authType));
+		Select authtype = new Select(authType);
+		authtype.selectByVisibleText(auth);
+	}
+	
+	public void enterUserName(String userNameValue){
+		wait.until(ExpectedConditions.visibilityOf(userName));
+		userName.clear();
+		userName.sendKeys(userNameValue);
+	}
+	
+	public void enterPassword(String passwordValue){
+		wait.until(ExpectedConditions.visibilityOf(password));
+		password.clear();
+		password.sendKeys(passwordValue);
+	}
+	
+	public boolean testConnection(){
+		wait.until(ExpectedConditions.visibilityOf(testConnection));
+		testConnection.click();
+		wait.until(ExpectedConditions.visibilityOf(messageBar));
+		//Thread.sleep(50)
+		if(messageBar.getText().contains("Successfully Connected")){
+			System.out.println(messageBar.getText());
+			return true;
+		}else{
+			System.out.println("Something went wrong");
+			System.out.println(messageBar.getText());
+			return false;
+		}
+	}
+	
+	public void clickOK(){
+		wait.until(ExpectedConditions.visibilityOf(ok));
+		ok.click();
+	}
+	
+	public void clickDirectoryFieldMapping(){
+		wait.until(ExpectedConditions.visibilityOf(dirFieldMap));
+		dirFieldMap.click();
+	}
+	
+	public void enterEmployeeID(String text){
+		wait.until(ExpectedConditions.visibilityOf(employeeID));
+		employeeID.clear();
+		employeeID.sendKeys(text);
+	}
+	
+	public void enterAIM(String text){
+		wait.until(ExpectedConditions.visibilityOf(aim));
+		aim.clear();
+		aim.sendKeys(text);
+	}
+	
+	public void enterMSN(String text){
+		wait.until(ExpectedConditions.visibilityOf(msn));
+		msn.clear();
+		msn.sendKeys(text);
+	}
+	
+	public void enterYahoo(String text){
+		wait.until(ExpectedConditions.visibilityOf(yahoo));
+		yahoo.clear();
+		yahoo.sendKeys(text);
+	}
+	
+	public void enterSameTime(String text){
+		wait.until(ExpectedConditions.visibilityOf(sametime));
+		sametime.clear();
+		sametime.sendKeys(text);
+	}
+	
+	public void enterAlterSametime(String text){
+		wait.until(ExpectedConditions.visibilityOf(alterSametime));
+		alterSametime.clear();
+		alterSametime.sendKeys(text);
+	}
+	
+	public void enterReuter(String text){
+		wait.until(ExpectedConditions.visibilityOf(reuter));
+		reuter.clear();
+		reuter.sendKeys(text);
+	}
+	
+	public void enterLCSBuddy(String text){
+		wait.until(ExpectedConditions.visibilityOf(lcsBuddy));
+		lcsBuddy.clear();
+		lcsBuddy.sendKeys(text);
+	}
+	
+	public void enterLCSPhone(String text){
+		wait.until(ExpectedConditions.visibilityOf(lcsPhone));
+		lcsPhone.clear();
+		lcsPhone.sendKeys(text);
+	}
+	
+	public void enterJabbar(String text){
+		wait.until(ExpectedConditions.visibilityOf(jabber));
+		jabber.clear();
+		jabber.sendKeys(text);
+	}
+	
+	public void enterGoogleTalk(String text){
+		wait.until(ExpectedConditions.visibilityOf(google));
+		google.clear();
+		google.sendKeys(text);
+	}
+	
+	public void enterBlackPIN(String text){
+		wait.until(ExpectedConditions.visibilityOf(blackPIN));
+		blackPIN.clear();
+		blackPIN.sendKeys(text);
+	}
+	
+	public void enterBlackPhone(String text){
+		wait.until(ExpectedConditions.visibilityOf(blackPhone));
+		blackPhone.clear();
+		blackPhone.sendKeys(text);
+	}
+	
+	public void enterBlackNameID(String text){
+		wait.until(ExpectedConditions.visibilityOf(blackName));
+		blackName.clear();
+		blackName.sendKeys(text);
+	}
+	
+	public void enterSkype(String text){
+		wait.until(ExpectedConditions.visibilityOf(skype));
+		skype.clear();
+		skype.sendKeys(text);
+	}
+	
+	public void enterSharePoint(String text){
+		wait.until(ExpectedConditions.visibilityOf(sharepoint));
+		sharepoint.clear();
+		sharepoint.sendKeys(text);
+	}
+	
+	public void enterConnection(String text){
+		wait.until(ExpectedConditions.visibilityOf(connection));
+		connection.clear();
+		connection.sendKeys(text);
+	}
+	
+	public void enterAlternateConnection(String text){
+		wait.until(ExpectedConditions.visibilityOf(alterConnection));
+		alterConnection.clear();
+		alterConnection.sendKeys(text);
+	}
+	
+	public void clickDailyAutoSync(){
+		wait.until(ExpectedConditions.visibilityOf(dailyAutoSync));
+		dailyAutoSync.click();
+	}
+	
+	public void clickEnableAutoSync() throws InterruptedException{
+		wait.until(ExpectedConditions.visibilityOf(enableAutoSync));
+		if(!enableAutoSync.isSelected()){
+			enableAutoSync.click();
+			Thread.sleep(2000);
+		}
+	}
+	
+	public void clickEnableAutoSyncCheckboxToDisableAutoSync() throws InterruptedException{
+		wait.until(ExpectedConditions.visibilityOf(enableAutoSync));
+		if(enableAutoSync.isSelected()){
+			enableAutoSync.click();
+			Thread.sleep(2000);
+		}
+	}
+	
+	public void selectTimeZone(String zone){
+		wait.until(ExpectedConditions.visibilityOf(timezone));
+		Select time = new Select(timezone);
+		time.selectByVisibleText(zone);
+	}
+	
+	public void clickOccursEvery() throws InterruptedException{
+		wait.until(ExpectedConditions.visibilityOf(occursEvery));
+		occursEvery.click();
+		Thread.sleep(2000);
+	}
+	
+	public void enterTime(String t){
+		wait.until(ExpectedConditions.visibilityOf(time));
+		time.clear();
+		time.sendKeys(t);
+	}
+	
+	public void selectMinOrHour(String option){
+		wait.until(ExpectedConditions.visibilityOf(hourOrMin));
+		Select dropdown = new Select(hourOrMin);
+		dropdown.selectByVisibleText(option);
+	}
+	
+	public void enterStartingAt(String startingAt){
+		wait.until(ExpectedConditions.visibilityOf(startAt));
+		startAt.clear();
+		startAt.sendKeys(startingAt);
+	}
+	
+	public void selectStartAMPM(String option){
+		wait.until(ExpectedConditions.visibilityOf(startAMPM));
+		Select dropdown = new Select(startAMPM);
+		dropdown.selectByVisibleText(option);
+	}
+	
+	public void enterEndAt(String endingAt){
+		wait.until(ExpectedConditions.visibilityOf(endAt));
+		endAt.clear();
+		endAt.sendKeys(endingAt);
+	}
+	
+	public void selectEndAMPM(String opton){
+		wait.until(ExpectedConditions.visibilityOf(endAMPM));
+		Select dropdown = new Select(endAMPM);
+		dropdown.selectByVisibleText(opton);
+	}
+	
+	public void selectServerID(String id){
+		wait.until(ExpectedConditions.visibilityOf(serverID));
+		Select server = new Select(serverID);
+		server.selectByVisibleText(id);
+	}
+	
+	public Configuration setLDAPConnection(String directoryDef, boolean directoryStatus, boolean globalPrimary,
+			String severType, String host, String port, String baseDN, String authType, String username,
+			String password){
+		selectDerectoryDefinition(directoryDef);
+		clickGo();
+		if(directoryStatus){
+			enableDirectoryStatus();
+		}
+		if(globalPrimary){
+			enableGlobalPrimary();
+		}
+		selectDirectoryServerType(severType);
+		enterHost(host);
+		enterPort(port);
+		enterBaseDN(baseDN);
+		selectAuthenticationType(authType);
+		enterUserName(username);
+		enterPassword(password);
+		assertTrue(testConnection(), "Could not Test the Connection");
+		enterPassword(password);
+		clickOK();
+		return PageFactory.initElements(driver, Configuration.class);
+	}
+	
+	public Configuration resetLDAPDirectoryFieldMapping(String password, String version, String directoryDef){
+		selectDerectoryDefinition(directoryDef);
+		clickGo();
+		enterPassword(password);
+		clickDirectoryFieldMapping();
+//		aim.clear();
+		//msn.clear();
+//		yahoo.clear();
+		sametime.clear();
+		alterSametime.clear();
+//		reuter.clear(); 
+//		lcsBuddy.clear();
+//		lcsPhone.clear();
+//		jabber.clear();
+		//google.clear();
+//		blackPIN.clear();
+//		blackPhone.clear();
+//		blackName.clear();
+//		skype.clear();
+//		sharepoint.clear();
+		connection.clear();
+		if(!version.equalsIgnoreCase("Old")){
+			alterConnection.clear();
+		}
+		clickOK();
+		return PageFactory.initElements(driver, Configuration.class);
+	}
+	
+	public Configuration setLDAPDirectoryFieldMapping(String password, String network, String value, String directoryDef,
+			String employeeID){
+		selectDerectoryDefinition(directoryDef);
+		clickGo();
+		enterPassword(password);
+		clickDirectoryFieldMapping();
+		enterEmployeeID(employeeID);
+		switch (network) {
+		case "AIM":
+			enterAIM(value);
+			break;
+		
+		case "MSN":
+			enterMSN(value);
+			break;
+		
+		case "Yahoo!":
+			System.out.println("Network Buddy Namee Value : "+ value);
+			enterYahoo(value);
+			break;	
+		
+		case "Sametime":
+			enterSameTime(value);
+			break;
+			
+		case "Alternate Sametime":
+			enterAlterSametime(value);
+			break;
+			
+		case "Reuters":
+			enterReuter(value);
+			break;
+	
+		case "MicrosoftUC":
+			enterLCSBuddy(value);
+			break;
+	
+		case "MicrosoftUC Phone":
+			enterLCSPhone(value);
+			break;
+	
+		case "Jabber":
+			enterJabbar(value);
+			break;
+	
+		case "Google Talk":
+			enterGoogleTalk(value);
+			break;
+	
+		case "BlackBerryPIN":
+			enterBlackPIN(value);
+			break;
+	
+		case "BlackBerryCall":
+			enterBlackPhone(value);
+			break;
+	
+		case "BlackBerry Name_ID":
+			enterBlackNameID(value);
+			break;
+		
+		case "Skype":
+			enterSkype(value);
+			break;
+		
+		case "SharePoint":
+			enterSharePoint(value);
+			break;
+		
+		case "Connections":
+			enterConnection(value);
+			break;
+			
+		case "Alternate Connections":
+			enterAlternateConnection(value);
+			break;
+			
+		default:
+			break;
+		}
+		clickOK();
+		return PageFactory.initElements(driver, Configuration.class);
+	}
+	
+	public Configuration setEnableAutoSync(String password, String timeZone, String atEvery, String minOrHour, 
+			String startingAt, String startAMOrPM, String serverID, String directoryDef) throws InterruptedException{
+		selectDerectoryDefinition(directoryDef);
+		clickGo();
+		enterPassword(password);
+		clickDailyAutoSync();
+		clickEnableAutoSync();
+		selectTimeZone(timeZone);
+		clickOccursEvery();
+		enterTime(atEvery);
+		selectMinOrHour(minOrHour);
+		enterStartingAt(startingAt);
+		selectStartAMPM(startAMOrPM);
+		enterEndAt("11:59");
+		selectEndAMPM("PM");
+		selectServerID(serverID);
+		clickOK();
+		return PageFactory.initElements(driver, Configuration.class);
+	}
+	
+	public Configuration disableAutoSync(String password) throws InterruptedException{
+		enterPassword(password);
+		clickDailyAutoSync();
+		clickEnableAutoSyncCheckboxToDisableAutoSync();
+		clickOK();
+		return PageFactory.initElements(driver, Configuration.class);
+	}
+}

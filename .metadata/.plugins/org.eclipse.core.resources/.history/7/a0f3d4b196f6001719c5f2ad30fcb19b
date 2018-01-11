@@ -1,0 +1,493 @@
+package com.actiance.tests.LDAP.utils;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Hashtable;
+
+import javax.naming.Context;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.BasicAttribute;
+import javax.naming.directory.BasicAttributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.InitialDirContext;
+import javax.naming.directory.ModificationItem;
+import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
+
+
+public class TestUtils implements LDAPConstants{
+	
+	DatabaseUtils db = new DatabaseUtils();
+	
+	
+	public HashMap<String, TestDataObject> readCSVFile(String filePath){
+		HashMap<String, TestDataObject> csvDataMap = new HashMap<String, TestDataObject>();
+		BufferedReader br;
+		TestDataObject td;
+		String line;
+		String[] values;
+		try{
+			br = new BufferedReader(new FileReader(filePath));
+			while((line = br.readLine()) != null){
+				values = line.split(",");
+				
+				td = new TestDataObject();
+				
+				td.setTestCaseNo(values[0].trim());
+				td.setTestCaseName(values[1].trim());
+				td.setEmployeeID(values[2].trim());
+				td.setNetwork(values[3].trim());
+				td.setBuddyNameMapping(values[4].trim());
+				td.setGroupName(values[5].trim());
+				td.setGivenName(values[6].trim());
+				td.setSn(values[7].trim());
+				td.setDomainName(values[8].trim());
+				
+				csvDataMap.put(values[0].trim(), td);
+			}
+			return csvDataMap;
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public DirContext getDirContext(String ldapURL, String authType, String userName, String password) 
+			throws NamingException{
+		Hashtable<String, String> environment = new Hashtable<String, String>();
+		
+		environment.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+		environment.put(Context.PROVIDER_URL, ldapURL);
+		environment.put(Context.SECURITY_AUTHENTICATION, authType);
+		environment.put(Context.SECURITY_PRINCIPAL, userName);
+		environment.put(Context.SECURITY_CREDENTIALS, password);
+		
+		DirContext dirCon = new InitialDirContext(environment);
+		System.out.println("Created DirContext connection");
+		return dirCon;
+	}
+	
+	public String[] getGroupMembers(DirContext dirCon, String grpName, String name){
+		String members[] = null;
+		String attr[] = {"member"};
+		String filter;
+		filter = "(cn="+grpName+")";
+		
+		SearchControls ctls = new SearchControls();
+		ctls.setSearchScope(SearchControls.OBJECT_SCOPE);
+		ctls.setReturningAttributes(attr);
+		
+		try{
+			NamingEnumeration<SearchResult> result = dirCon.search(name, filter, ctls);
+			while(result.hasMoreElements()){
+				SearchResult sr = result.next();
+				members = sr.getAttributes().get("member").toString().substring(8).split(", ");
+				for(int i=0;i<members.length;i++){
+					System.out.println("Member DN: "+members[i]);
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		System.out.println();
+		return members;
+	}
+	
+	public HashMap<String, HashMap<String, String>> getEmployeeDetails(DirContext dirCon, String[] DN){
+		
+		HashMap<String, HashMap<String, String>> empDetails = new HashMap<String, HashMap<String,String>>();
+		
+		String attr[] = {"sn", "givenName", "userPrincipalName", "mail", "cn"};
+		
+		SearchControls ctls = new SearchControls();
+		ctls.setSearchScope(SearchControls.OBJECT_SCOPE);
+		ctls.setReturningAttributes(attr);
+		
+		try{
+			for(int i=0;i<DN.length;i++){
+				
+				String filter = "("+DN[i].split(",")[0]+")";
+				String userPrincipalname = null;
+				HashMap<String, String> employee = new HashMap<String, String>();
+				
+				NamingEnumeration<SearchResult> result = dirCon.search(DN[i], filter, ctls);
+				while(result.hasMoreElements()){
+					SearchResult sr = result.next();
+					Attributes srAttr = sr.getAttributes();
+					employee.put("sn", srAttr.get("sn").toString().split(": ")[1]);
+					employee.put("givenName", srAttr.get("givenName").toString().split(": ")[1]);
+					userPrincipalname = srAttr.get("userPrincipalName").toString().split(": ")[1];
+					employee.put("userPrincipalName", userPrincipalname);
+					if(srAttr.get("mail") != null){
+						employee.put("mail", srAttr.get("mail").toString().split(": ")[1]);
+					}else{
+						employee.put("mail", "N/A");
+					}
+					employee.put("cn", srAttr.get("cn").toString().split(": ")[1]);
+				}
+				empDetails.put(userPrincipalname, employee);
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return empDetails;
+	}
+	
+	public void closeConnection(DirContext dirCon){
+		try{
+			dirCon.close();
+			System.out.println("Closed the DirContext connection");
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	public ArrayList<String> getEmployeeDetails(Statement st, String employeeID) throws SQLException{
+		String query;
+		ArrayList<String> values = new ArrayList<String>();
+		ResultSet result;
+		
+		//Query employee table
+		query = "select intEmployeeID, firstName, lastName from Employees where employeeID = '"+employeeID+"'";
+		result = db.executeQuery(st, query);
+		result.next();
+		values.add(result.getInt("intEmployeeID")+"");
+		values.add(result.getString("firstName"));
+		values.add(result.getString("lastName"));
+		
+		return values;
+	}
+	
+	public HashMap<String, String> getBuddyNameDetails(Statement st, String intEmployeeID) throws SQLException{
+		String query;
+		String query2;
+		ResultSet result;
+		HashMap<String, Integer> values = new HashMap<>();
+		HashMap<String, String> buddyNameNetworkMap = new HashMap<>();
+		
+		query = "select buddyName, networkID from EmployeeBuddyNames where intEmployeeID ="+intEmployeeID+" and deletedFlag = 0";
+		result = db.executeQuery(st, query);
+		while(result.next()){
+			values.put(result.getString("buddyName"), result.getInt("networkID"));
+		}
+		
+		for(String buddyName : values.keySet()){
+			query2 = "select name from Networks where networkID = "+values.get(buddyName);
+			ResultSet result2 = db.executeQuery(st, query2);
+			result2.next();
+			buddyNameNetworkMap.put(buddyName, result2.getString("name"));
+		}
+		
+		return buddyNameNetworkMap;
+		
+		/*try{
+			query = "select E.intEmployeeID, E.firstName, E.lastName, EB.buddyName, N.name " +
+					"from Employees E, EmployeeBuddyNames EB, Networks N "
+					+"where E.employeeID = '"+ employeeID +"'" +
+					"and E.intEmployeeID = EB.intEmployeeID and EB.networkID = N.networkID " +
+					"and EB.deletedFlag = 0";
+			//System.out.println(query);
+			ResultSet result = db.executeQuery(st, query);
+			if(result.next()){
+				values.add(result.getInt("intEmployeeID")+"");
+				values.add(result.getString("firstName"));
+				values.add(result.getString("lastName"));
+				values.add(result.getString("buddyName"));
+				values.add(result.getString("name"));
+				return values;
+			}else{
+				System.out.println("There is no data");
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}*/
+		//return null;
+	}
+	
+	public boolean verifyEmployeeFirstNameAndLastName(ArrayList<String> employeeFromDB, String firstName, String lastName){
+		System.out.println(employeeFromDB.get(1)+" "+firstName+" "+employeeFromDB.get(2)+" "+lastName);
+		if(employeeFromDB.get(1).equalsIgnoreCase(firstName) &&
+				employeeFromDB.get(2).equalsIgnoreCase(lastName)){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	public boolean isEmployeeDelted(Statement st, String employeeID) throws SQLException{
+		String query;
+		query = "select deletedFlag from Employees where employeeID = '"+employeeID+"'";
+		ResultSet result = db.executeQuery(st, query);
+		result.next();
+		return result.getBoolean("deletedFlag");
+	}
+	
+	public boolean verifyBuddyNameAndNetwok(String buddyName, String mappingValueFromCSV,
+			String network, String networkFromCSV){
+		System.out.println(buddyName+", "+mappingValueFromCSV+", "+network+", "+networkFromCSV);
+		if(buddyName.equalsIgnoreCase(mappingValueFromCSV) && network.equalsIgnoreCase(networkFromCSV)){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	public boolean isBuddyNameMappingRemoved(Statement st, String employeeID, int networkID) throws SQLException{
+		String query;
+		ResultSet result;
+		int intEmployeeID;
+		
+		query = "select intEmployeeID from Employees where employeeID = '"+employeeID+"'";
+		result = db.executeQuery(st, query);
+		result.next();
+		intEmployeeID = result.getInt("intEmployeeID");
+		
+		query = "select deletedFlag from EmployeeBuddyNames where intEmployeeID = "+intEmployeeID+" and networkID = "+networkID;
+		result = db.executeQuery(st, query);
+		while(result.next()){
+			if(!result.getBoolean("deletedFlag")){
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public int getNetworkID(Statement st, String network) throws SQLException{
+		String query;
+		ResultSet result;
+		query = "select networkID from Networks where name = '"+network+"'";
+		result = db.executeQuery(st, query);
+		result.next();
+		return result.getInt("networkID");
+	}
+	
+/*	public Attributes getUserAttributes(String givenName, String sn, String domainName){
+		Attributes userAttr = new BasicAttributes(true);
+		
+		BasicAttribute objectClass = new BasicAttribute("objectClass");
+		objectClass.add("top");
+		objectClass.add("person");
+		objectClass.add("organizationalPerson");
+		objectClass.add("user");
+		
+		BasicAttribute firstName = new BasicAttribute("givenName", givenName);
+		BasicAttribute lastName = new BasicAttribute("sn", sn);
+		BasicAttribute displayName = new BasicAttribute("displayName", givenName+" "+sn);
+		BasicAttribute name = new BasicAttribute("name", givenName+" "+sn);
+		BasicAttribute userPrincipalName = new BasicAttribute("userPrincipalName", givenName+sn+domainName);
+		BasicAttribute mail = new BasicAttribute("mail", givenName+sn+domainName);
+		
+		userAttr.put(objectClass);
+		userAttr.put(firstName);
+		userAttr.put(lastName);
+		userAttr.put(displayName);
+		userAttr.put(name);
+		userAttr.put(userPrincipalName);
+		userAttr.put(mail);
+		//This propertry is required to create a Normal user with Password never expires
+		userAttr.put("userAccountControl", "66048");
+		
+		return userAttr;
+	}
+	*/
+	public Attributes getUserAttributes(int userNumber, String domainName){
+		Attributes userAttr = new BasicAttributes(true);
+		
+		BasicAttribute objectClass = new BasicAttribute("objectClass");
+		objectClass.add("top");
+		objectClass.add("person");
+		objectClass.add("organizationalPerson");
+		objectClass.add("user");
+		
+//		System.out.println(mappingMail + userNumber + mappingDomain);
+		
+		BasicAttribute firstName = new BasicAttribute("givenName", fName+userNumber);
+		BasicAttribute lastName = new BasicAttribute("sn", lName+userNumber);
+		BasicAttribute displayName = new BasicAttribute("displayName", fName+userNumber+" "+lName+userNumber);
+		BasicAttribute name = new BasicAttribute("name", fName+userNumber+" "+lName+userNumber);
+		BasicAttribute userPrincipalName = new BasicAttribute("userPrincipalName", userPrincipal+userNumber+"@"+domainName);
+		BasicAttribute mail = new BasicAttribute("mail", userPrincipal + userNumber+"@"+domainName);
+		
+		userAttr.put(objectClass);
+		userAttr.put(firstName);
+		userAttr.put(lastName);
+		userAttr.put(displayName);
+		userAttr.put(name);
+		userAttr.put(userPrincipalName);
+		userAttr.put(mail);
+		//This propertry is required to create a Normal user with Password never expires
+		userAttr.put("userAccountControl", userAccount);
+		
+		return userAttr;
+	}
+	
+	public boolean createUser(String DN, DirContext dirCon, Attributes attr){
+		//set password is a ldap modfy operation
+		//and we'll update the userAccountControl
+		//enabling the acount and force the user to update ther password
+		//the first time they login
+		try{
+			ModificationItem[] mod = new ModificationItem[1]; 
+		
+			//Replace the "unicdodePwd" attribute with a new value
+			//Password must be both Unicode and a quoted string
+			String newQuotedPassword = "\"FaceTime@123\"";
+			byte[] newUnicodePassword = newQuotedPassword.getBytes("UTF-16LE");
+		
+			System.out.println("DN: "+DN);
+			//System.out.println(attr.toString());
+			
+			//Create user
+			dirCon.createSubcontext(DN, attr);
+			System.out.println("Executed createSubcontext method");
+			
+			mod[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("userPassword", newUnicodePassword));
+			
+			//Perform the update
+			dirCon.modifyAttributes(DN, mod);
+			System.out.println("Updated password");
+			return true;
+		}catch(Exception e){
+			e.printStackTrace();
+			return false;
+		}
+		
+	}
+	
+	public boolean createGroup(String DN, DirContext dirCon) throws NamingException{
+		
+		BasicAttribute objectClass = new BasicAttribute("objectClass");
+		objectClass.add("top");
+		objectClass.add("group");  
+		
+		BasicAttribute cn = new BasicAttribute("cn", newGroupName);
+		
+		Attributes attr = new BasicAttributes(true);
+		attr.put(objectClass);
+		attr.put(cn);
+		
+		dirCon.createSubcontext(DN, attr);
+		System.out.println("Created Group");
+		return true;
+	}
+	
+	public boolean createSpecialGroup(String DN, DirContext dirCon) throws NamingException{
+		
+		BasicAttribute objectClass = new BasicAttribute("objectClass");
+		objectClass.add("top");
+		objectClass.add("group");  
+		
+		BasicAttribute cn = new BasicAttribute("cn", newGroupNameSpl);
+		
+		Attributes attr = new BasicAttributes(true);
+		attr.put(objectClass);
+		attr.put(cn);
+		
+		dirCon.createSubcontext(DN, attr);
+		System.out.println("Created Group");
+		return true;
+	}
+	
+	public void modifyAttributes(String DN, DirContext dirCon, String option, String attribute, String value) throws NamingException{
+		int modOpt = 0;
+		
+		Attributes newAttribute = new BasicAttributes();
+		BasicAttribute attr = new BasicAttribute(attribute, value);
+		newAttribute.put(attr);
+		
+		switch (option) {
+		case "Add":
+			modOpt = DirContext.ADD_ATTRIBUTE;
+			break;
+		case "Remove":
+			modOpt = DirContext.REMOVE_ATTRIBUTE;
+			break;
+		case "Replace":
+			modOpt = DirContext.REPLACE_ATTRIBUTE;
+		default:
+			break;
+		}
+		
+		dirCon.modifyAttributes(DN, modOpt, newAttribute);
+		System.out.println("Modified the Attribute: "+attribute);
+	}
+	
+	public String getDNForCreatingUser(String groupDN, String givenName, String sn){
+		String OU = groupDN.substring(groupDN.indexOf(",")+1);
+		System.out.println("OU: "+OU);
+		return "CN="+givenName+" "+sn+","+OU;
+	}
+	
+	public String getTime() throws ParseException{
+		SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm a zzz");
+		String time = dateFormat.format(new Date());
+		Calendar cal = Calendar.getInstance();
+		Date date = dateFormat.parse(time);
+		cal.setTime(date);
+		cal.add(Calendar.MINUTE, 2);
+		String newTime = dateFormat.format(cal.getTime());
+		System.out.println("Time: "+time+" New Time: "+newTime);
+		return newTime;
+	}
+	
+	public String getDatabaseURL(String host, String table){
+		return "jdbc:sqlserver://"+host.trim()+":1433;database="+table.trim();
+	}
+	
+	public String getVantageURL(String host){
+		return "https://"+host.trim()+":8443/ima";
+	}
+	
+	public String getLDAPURL(String host){
+		return "ldap://"+host.trim()+":389";
+	}
+	
+	public String getDomainName(String baseDN){
+		return baseDN.substring(baseDN.indexOf("=")+1, baseDN.indexOf(","))+"."+baseDN.substring(baseDN.lastIndexOf("=")+1);
+	}
+	
+	public int getCurrentEmployeesCount(Statement st){
+		try{
+			String query = "Select count(*) from Employees";
+			ResultSet rs = st.executeQuery(query);
+			rs.next();
+			return rs.getInt(1);
+		}catch (Exception e){
+			System.out.println("Error while getting current interactions count");
+			e.printStackTrace();
+		}
+		return 0;
+	}
+	
+	public boolean isAllEmployeesLoaded(Statement st, int initialCount, int numberOfEmployees) throws SQLException, InterruptedException{
+		String query = "Select count(*) from Employees";
+		int currentCount = 0;
+		int i=0;
+		while(i++ < 240){
+			ResultSet rs = st.executeQuery(query);
+			rs.next();
+			currentCount = rs.getInt(1);
+			System.out.println("Initial Count: "+initialCount+", Current Count: "+currentCount+" Time: "+System.currentTimeMillis());
+			if((currentCount - initialCount) >= numberOfEmployees){
+				System.out.println(numberOfEmployees+" Employees have been loaded from LDAP");
+				return true;
+			}
+			Thread.sleep(60000);
+		}
+		System.out.println("Employees count did not match with the expcted count");
+		System.out.println("Employees loaded count: "+(currentCount - initialCount));
+		return false;
+	}
+	
+}

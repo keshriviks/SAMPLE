@@ -1,0 +1,17 @@
+package com.actiance.tests;
+
+import java.util.concurrent.TimeUnit;
+
+import org.openqa.selenium.chrome.ChromeDriver;
+
+public class Samplelogin {
+
+	System.setProperty("webdriver.chrome.driver", "D:\\Software\\chrome\\chromedriver.exe");
+	driver = new ChromeDriver();
+	
+	
+	driver.manage().window().maximize();
+	driver.manage().timeouts().implicitlyWait(200, TimeUnit.SECONDS);
+    driver.manage().timeouts().pageLoadTimeout(150, TimeUnit.SECONDS);
+    driver.get("https://192.168.114.8:8443/ima/");
+}
